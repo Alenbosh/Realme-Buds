@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a problem with the OnePlus Buds plugin
+about: Report a problem with the realme Buds plugin
 title: ''
 labels: ''
 assignees: ''

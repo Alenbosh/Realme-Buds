@@ -59,7 +59,7 @@ def main():
         seen = set()
         while not stopped.is_set():
             try:
-                result = subprocess.run(['omarchy-shell', 'oneplus-buds.control', 'status'],
+                result = subprocess.run(['omarchy-shell', 'realme-buds.control', 'status'],
                     capture_output=True, text=True, timeout=2)
                 data = json.loads(result.stdout)
                 for event in data.get('lifecycle', []):

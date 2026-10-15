@@ -41,7 +41,7 @@ panel. Verified and Community Tested devices show **Report a problem**;
 Experimental devices show **Report compatibility** beneath their compatibility
 notice. All use the same workflow: the panel explains the report contents, proposes
 a safe `.txt` filename, lets you choose where to save it, and never uploads it.
-After saving, open the [compatibility report template](https://github.com/GazzasaurusRex/oneplus-buds-omarchy/issues/new?template=compatibility.md)
+After saving, open the [compatibility report template](https://github.com/Alenbosh/Realme-Buds/issues/new?template=compatibility.md)
 and attach the reviewed report yourself. Reports covering detection, battery, ANC,
 Transparency and EQ are welcome even when everything works.
 
@@ -73,7 +73,7 @@ checks availability only and does not connect to the earbuds.
 Install from GitHub using Omarchy's supported installer:
 
 ```bash
-omarchy plugin add https://github.com/GazzasaurusRex/oneplus-buds-omarchy.git realme-buds.control
+omarchy plugin add https://github.com/Alenbosh/Realme-Buds.git realme-buds.control
 python3 "$HOME/.config/omarchy/plugins/realme-buds.control/scripts/check_dependencies.py"
 omarchy plugin enable realme-buds.control --section right
 ```

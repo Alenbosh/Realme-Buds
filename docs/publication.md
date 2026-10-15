@@ -16,7 +16,7 @@ install hooks. A read-only dependency preflight and a clean exporter are include
 
 The version remains an unreleased release candidate; preparing it does not create
 a tag, GitHub release, or marketplace listing. The repository is
-`https://github.com/GazzasaurusRex/oneplus-buds-omarchy.git`. Its initial
+`https://github.com/Alenbosh/Realme-Buds.git`. Its initial
 commit is preserved in history. At the user's request, the current LICENSE uses
 the project's original MIT notice, Copyright (c) 2026 Gaz and contributors.
 
@@ -24,18 +24,18 @@ the project's original MIT notice, Copyright (c) 2026 Gaz and contributors.
 
 | Field | Proposed value |
 |---|---|
-| Repository URL | https://github.com/GazzasaurusRex/oneplus-buds-omarchy |
+| Repository URL | https://github.com/Alenbosh/Realme-Buds |
 | Category | Hardware |
 | Tags | `bar`, `media`, `quickshell` |
-| Plugin name | OnePlus Buds Control |
-| ID | `oneplus-buds.control` |
+| Plugin name | realme Buds Control |
+| ID | `realme-buds.control` |
 | Version | `0.1.0` (release candidate; not tagged) |
 | License | MIT |
 
 Maintainer notes:
 
-> Native Omarchy service/bar widget for OnePlus earbuds, with a Python backend
-> using BlueZ D-Bus and Bluetooth Classic RFCOMM. Buds Pro and Buds Pro 2 battery,
+> Native Omarchy service/bar widget for realme and OnePlus earbuds, with a Python backend
+> using BlueZ D-Bus and Bluetooth Classic RFCOMM. realme Buds T310, OnePlus Buds Pro and Buds Pro 2 battery,
 > firmware, noise controls, and model-appropriate native EQ are hardware-verified. Requires system
 > Python 3.11+, python-dbus and BlueZ. No PyPI runtime dependencies or install
 > hooks. One helper follows plugin lifecycle inside the existing shell; no second
@@ -70,15 +70,15 @@ being committed for marketplace use.
 For a public Git URL, the current install flow is:
 
 ```bash
-omarchy plugin add https://github.com/GazzasaurusRex/oneplus-buds-omarchy.git
-python3 "$HOME/.config/omarchy/plugins/oneplus-buds.control/scripts/check_dependencies.py"
-omarchy plugin enable oneplus-buds.control --section right
+omarchy plugin add https://github.com/Alenbosh/Realme-Buds.git realme-buds.control
+python3 "$HOME/.config/omarchy/plugins/realme-buds.control/scripts/check_dependencies.py"
+omarchy plugin enable realme-buds.control --section right
 ```
 
 Decline immediate enable if offered until the preflight passes. Omarchy performs the clone,
 validation and enable flow; it does not install Python dependencies. Users should
 run the documented preflight before enabling. Updates for Git-managed installs
-use `omarchy plugin update oneplus-buds.control`; copied exports must be replaced
+use `omarchy plugin update realme-buds.control`; copied exports must be replaced
 only after preserving any local modifications.
 
 ## Local verification scope
@@ -87,10 +87,10 @@ Use a fresh export for packaging checks so hidden repository files, caches and
 virtual environments cannot influence imports:
 
 ```bash
-python3 scripts/export_plugin.py /tmp/oneplus-publication-review
-omarchy plugin validate /tmp/oneplus-publication-review
-/tmp/oneplus-publication-review/oneplus-buds --help
-python3 /tmp/oneplus-publication-review/scripts/check_dependencies.py
+python3 scripts/export_plugin.py /tmp/realme-publication-review
+omarchy plugin validate /tmp/realme-publication-review
+/tmp/realme-publication-review/realme-buds --help
+python3 /tmp/realme-publication-review/scripts/check_dependencies.py
 ```
 
 The exporter refuses an existing destination and source symlinks, preserves
