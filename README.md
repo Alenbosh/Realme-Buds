@@ -1,0 +1,215 @@
+# realme & OnePlus Buds Control for Omarchy
+
+A native Omarchy bar widget and Linux backend for realme and OnePlus earbuds. Check battery
+levels and change noise control from a compact, theme-aware panel.
+
+**Status: 0.1.0 release candidate.** realme Buds T310, OnePlus Buds Pro, and OnePlus Buds Pro 2
+have hardware-verified basic controls and native EQ. No release tag has been created yet.
+This is an independent project, unaffiliated with realme, OnePlus, or OPPO.
+
+## What works
+
+- Automatic selection of one connected compatible realme/OnePlus/OPPO device.
+- Connection status, left/right battery, case battery when returned, and firmware.
+- Independently verified ANC On, Off, Transparency and profile-supported strengths.
+- Model-correct native earbud EQ presets on realme Buds T310, OnePlus Buds Pro, and Buds Pro 2, plus device-defined custom EQ on Pro 2.
+- Icon-only idle widget; hover reveals known batteries (with charging indicators), with delayed collapse.
+- Responsive panel with full-width device status, balanced ANC/EQ columns when
+  space permits, and a compact scrolling fallback on narrow displays.
+- A privacy-safe diagnostic report for compatibility investigations.
+
+| Device | Product ID | Evidence | Tested firmware | ANC / Noise Control | EQ Presets |
+|---|---|---|---|---|---|
+| realme Buds T310 | `063C12` | Verified on hardware | 1.1.0.47 | Off, Transparency, ANC On | Balanced, Clear Bass, Clear Vocals, Bright |
+| OnePlus Buds Pro | `060C14` | Verified on hardware | 541.541.510 | Off, Transparency, ANC (Light, Deep, Smart) | Balanced, Deep Sea Bass, Pure Vocals, Bright & Crisp |
+| OnePlus Buds Pro 2 | `062014` | Verified on hardware | 196.196.101 | Off, Transparency, ANC (Light, Medium, Deep, Smart) | 5 Presets + 6-band Custom EQ |
+| Other compatible realme/OnePlus/OPPO devices | Unknown | Experimental if recognised | Unknown | Not exposed | Not exposed |
+
+See [compatibility and limitations](docs/devices/compatibility.md). Gestures,
+spatial audio and other HeyMelody/Realme Link features are not implemented controls.
+
+## Compatibility and reports
+
+realme Buds T310, OnePlus Buds Pro, and OnePlus Buds Pro 2 are hardware-verified
+on reference devices. Other recognised realme/OnePlus/OPPO-compatible models are
+**Experimental** until tested. A model may become **Community Tested** after an
+owner reports successful, reproducible checks on their own hardware; that label
+does not mean maintainer hardware verification.
+
+Every connected device has a quiet reporting link at the bottom of the control
+panel. Verified and Community Tested devices show **Report a problem**;
+Experimental devices show **Report compatibility** beneath their compatibility
+notice. All use the same workflow: the panel explains the report contents, proposes
+a safe `.txt` filename, lets you choose where to save it, and never uploads it.
+After saving, open the [compatibility report template](https://github.com/GazzasaurusRex/oneplus-buds-omarchy/issues/new?template=compatibility.md)
+and attach the reviewed report yourself. Reports covering detection, battery, ANC,
+Transparency and EQ are welcome even when everything works.
+
+## Requirements
+
+Live-tested with Omarchy **4.0.2-1** and **4.0.3-1**, its
+Quickshell/Quattro shell, BlueZ 5.87 and Python 3.14.7. Python 3.11+ is required;
+older Python releases have not been tested here.
+The native widget needs Omarchy's `qs.Ui` and `qs.Commons` modules, not a standalone
+Quickshell session. Other desktop environments can use the CLI only.
+
+Runtime dependencies are system Python, `python-dbus`, BlueZ and the running
+Omarchy shell. `bluez-utils` provides Bluetooth setup/diagnostic commands. No PyPI
+packages, separate daemon, root access or audio-configuration changes are needed
+for normal operation. Check prerequisites from this checkout:
+
+```bash
+python3 scripts/check_dependencies.py
+systemctl is-active bluetooth
+```
+
+If the binding is missing on Omarchy, `omarchy pkg add python-dbus` installs the
+Arch package and may request administrator authorization. Use system Python;
+isolated virtual environments generally do not see that binding. The preflight
+checks availability only and does not connect to the earbuds.
+
+## Install and remove
+
+Install from GitHub using Omarchy's supported installer:
+
+```bash
+omarchy plugin add https://github.com/GazzasaurusRex/oneplus-buds-omarchy.git realme-buds.control
+python3 "$HOME/.config/omarchy/plugins/realme-buds.control/scripts/check_dependencies.py"
+omarchy plugin enable realme-buds.control --section right
+```
+
+If the installer offers to enable immediately, decline until the dependency check
+passes. This is a release candidate; no tagged release is available yet.
+
+For an existing local checkout, copy it into the user plugin directory without
+Git internals or caches. The destination must not already exist:
+
+```bash
+python3 scripts/export_plugin.py "$HOME/.config/omarchy/plugins/realme-buds.control"
+omarchy plugin validate "$HOME/.config/omarchy/plugins/realme-buds.control"
+omarchy-shell shell rescanPlugins
+omarchy plugin enable realme-buds.control --section right
+```
+
+The exporter writes only to the new destination. Enabling uses Omarchy's supported
+layout API; it does not replace your shell configuration. Run these commands inside
+your existing Omarchy graphical session. Do not start another Quickshell instance.
+
+See [publication notes](docs/publication.md) for release and marketplace status.
+Installation has no dependency hook, so run the dependency check before enabling.
+
+To stop the helper and hide the widget:
+
+```bash
+omarchy plugin disable realme-buds.control
+```
+
+To remove it:
+
+```bash
+omarchy plugin remove realme-buds.control
+```
+
+Omarchy asks for confirmation; it backs up a copied directory or removes a
+Git-managed installation. This does not unpair earbuds or change their last ANC
+mode. Removal affects the plugin's layout entry, not unrelated bar settings.
+
+## Use
+
+Pair and connect your earbuds through Omarchy's Bluetooth panel first. This plugin
+does not pair devices or connect audio. Keep only one compatible device connected
+when using the bar; multi-device selection currently exists only in the CLI.
+
+Hover the earbuds icon to see available battery values (including charging glyphs
+⚡ when reported). Click anywhere on the expanded widget to open the panel. Noise control
+and ANC strength appear only when supported. Selected controls reflect read-back state.
+A pending request is shown until verified; an acknowledgement alone never produces a
+success message.
+
+Wear the earbuds for ANC tests: devices in their case may reject changes. For realme
+Buds T310, Off, Transparency, and ANC On modes are supported. For OnePlus Buds Pro and
+Buds Pro 2, specific ANC strengths (Light, Medium, Deep, Smart) can also be selected.
+Warm main mode changes reuse the authenticated session; recorded timings are in
+[the measurement notes](docs/measurements/anc-baseline.md).
+Native EQ controls live only in the opened panel. Verified factory presets are displayed
+for supported models: realme Buds T310 provides Balanced, Clear Bass, Clear Vocals, and
+Bright; OnePlus Buds Pro provides Balanced, Deep Sea Bass, Pure Vocals, and Bright & Crisp;
+OnePlus Buds Pro 2 provides Balanced, Bass, Serenade, Bold, and Hans Zimmer Soundscape
+Tuning, plus controls generated from its returned custom-band definition. Changes are
+written to the earbuds and persist independently of the Linux audio route—no system-wide
+software EQ is installed or configured.
+Connection startup uses BlueZ availability notifications while retaining bounded
+retry fallback; phase-by-phase results are in the
+[connection lifecycle measurements](docs/measurements/connection-lifecycle.md).
+
+## CLI and diagnostic reports
+
+The included executable needs no package installation. Both `./realme-buds` and
+`./oneplus-buds` (compatibility link) commands are provided. **Disable the plugin before
+running CLI queries or diagnostics**: both use the device's single RFCOMM control
+channel (channel 1 on realme Buds T310; channel 15 on OnePlus Buds Pro). Re-enable
+afterward to resume monitoring.
+
+```bash
+omarchy plugin disable realme-buds.control
+./realme-buds devices
+./realme-buds status
+./realme-buds anc status
+./realme-buds anc set anc          # or: off, transparency
+./realme-buds eq status
+./realme-buds eq list
+./realme-buds eq set balanced
+./realme-buds diagnostics --report
+omarchy plugin enable realme-buds.control --section right
+```
+
+Use `./realme-buds --help` for all commands. Explicit selection puts
+`--device ADDRESS` before the command. `devices` prints Bluetooth addresses for
+selection; do not paste it into public issues. The panel report uses the already
+connected service and does not alter earbud state. The CLI report is the fallback
+when the panel is unavailable. Both omit Bluetooth addresses, device aliases,
+user/host identity, home paths, credentials, unrelated devices and raw packets.
+Review any report before sharing it. See [CLI details](docs/backend-cli.md).
+
+## Troubleshooting
+
+- **Disconnected icon:** connect earbuds in the Bluetooth panel, check the daemon,
+  and ensure only one compatible device is connected. Recovery backs off to 30 s.
+- **Missing dbus binding:** run the preflight with system Python and install
+  `python-dbus`; pip-only environments are not sufficient.
+- **Busy control channel:** disable this plugin before CLI/hardware tools. Also
+  close other earbud-control applications; do not restart Bluetooth unnecessarily.
+- **ANC change fails:** take both earbuds out of the case, wear them and retry.
+  The UI keeps failure visible rather than assuming a change succeeded.
+- **Case battery absent:** some responses do not include it; the UI hides missing
+  fields. Charging/presence semantics still need deliberate edge-case testing.
+- **A physical gesture is not reflected immediately:** notification payload mapping
+  is incomplete. Reopening the popup alone does not query fresh hardware state.
+  For a fresh check, disable the plugin, query with the CLI, then re-enable it.
+- **Widget fails to load:** validate the installed folder and inspect shell logs for
+  plugin-specific errors. During development, a unique exported source path may be
+  needed because the long-running shell caches QML URLs. See the [integration notes](docs/omarchy-integration.md).
+
+## Development
+
+The backend separates BlueZ discovery, RFCOMM transport, OPO framing, profiles,
+features, typed APIs, serialized session ownership and the frontend bridge. QML
+owns presentation and one child-process helper; protocol code stays in Python.
+See [architecture](docs/backend-api.md), [bridge](docs/frontend-bridge.md),
+[protocol](docs/protocols/OPOv1.md) and [contributing](CONTRIBUTING.md).
+
+```bash
+PYTHONPATH=src python3 -m unittest discover -s tests
+python3 tests/run_qml_hover.py
+omarchy plugin validate .
+```
+
+Node runs the JavaScript model checks when available. Qt 6 `qmltestrunner` is needed
+for the offscreen UI check, which stubs shell services and never contacts hardware.
+The Python package metadata is for backend-only distribution; the Omarchy plugin
+uses the full repository/export, not a wheel. Building a wheel separately requires
+setuptools >=77; that is not a plugin runtime dependency.
+
+## License
+
+MIT; see [LICENSE](LICENSE) and [research provenance](docs/research/open-source.md).

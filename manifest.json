@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "realme-buds.control",
+  "name": "realme Buds Control",
+  "version": "0.1.0",
+  "author": "Gaz",
+  "description": "Native realme earbuds controls for Omarchy. Hardware verified on realme Buds T310, OnePlus Buds Pro and Buds Pro 2.",
+  "kinds": ["service", "bar-widget"],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "realme Buds",
+    "description": "Controls for realme Buds T310 and compatible earbuds.",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/Alenbosh/Realme-Buds",
+  "homepage": "https://github.com/Alenbosh/Realme-Buds"
+}

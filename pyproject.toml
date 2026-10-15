@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "realme-buds"
+version = "0.1.0"
+description = "Linux backend for OPO-compatible realme earbuds"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Alenbosh/Realme-Buds.git"
+Issues = "https://github.com/Alenbosh/Realme-Buds/issues"
+
+[project.scripts]
+realme-buds = "realme_buds.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
