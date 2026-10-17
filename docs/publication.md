@@ -8,7 +8,7 @@ on 2026-09-10. The installed Omarchy 4.0.3-1 validator was exercised too.
 
 ## Prepared locally
 
-The root manifest declares `oneplus-buds.control`, version `0.1.0`, with service
+The root manifest declares `realme-buds.control`, version `0.1.0`, with service
 and bar-widget entry points. README, MIT license, changelog, contribution guidance,
 compatibility matrix and issue templates are present. Runtime dependencies and
 known limitations are documented. The plugin runs from bundled source without
@@ -17,8 +17,9 @@ install hooks. A read-only dependency preflight and a clean exporter are include
 The version remains an unreleased release candidate; preparing it does not create
 a tag, GitHub release, or marketplace listing. The repository is
 `https://github.com/Alenbosh/Realme-Buds.git`. Its initial
-commit is preserved in history. At the user's request, the current LICENSE uses
-the project's original MIT notice, Copyright (c) 2026 Gaz and contributors.
+commit is preserved in history. The current LICENSE uses
+the MIT notice, Copyright (c) 2026 Alen(Manish) and contributors.
+
 
 ## Reviewable submission draft
 
