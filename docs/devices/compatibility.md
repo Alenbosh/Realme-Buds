@@ -4,10 +4,8 @@ Compatibility describes evidence, not a promise that every firmware works.
 
 | Product | Product ID | Status | Evidence |
 |---|---|---|---|
-| OnePlus Buds Pro | `060C14` | Verified | [Device record](oneplus-buds-pro.md) |
-| OnePlus Buds Pro 2 | `062014` | Verified | [Device record](oneplus-buds-pro-2.md) |
-| realme Buds T310 | `063C12` | Verified | Hardware-verified (channel 1, ANC, EQ, battery) |
-| Other compatible OnePlus/OPO/realme products | Unknown | Experimental if discovered | No maintainer verification |
+| realme Buds T310 | `063C12` | Verified | [Device record](realme-buds-t310.md) |
+| Other compatible realme Buds products | Unknown | Experimental if discovered | No maintainer verification |
 
 There are no community-tested models recorded yet. **Verified** means maintainer
 hardware testing on reference devices and their recorded firmware.
@@ -19,8 +17,8 @@ Community Tested is an evidence label; write controls remain gated to
 maintainer-hardware-verified profiles.
 
 Current discovery requires a connected BlueZ device whose name contains
-`oneplus`, `oppo`, or `realme` and whose UUIDs contain one of the two known OPO services.
-Renamed devices may not match. An unverified OPPO or realme match is an Experimental
+`realme` and whose UUIDs contain the known service UUID.
+Renamed devices may not match. An unverified realme match is an Experimental
 candidate, not a support claim. BLE-only products and other protocol
 families are not supported.
 

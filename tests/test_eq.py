@@ -26,7 +26,7 @@ from realme_buds.session import OpoSession
 
 DEVICE = Device(
     address="AA:BB:CC:DD:EE:FF",
-    name="OnePlus Buds Pro 2",
+    name="realme Buds T310",
     connected=True,
     uuids=("0000079a-d102-11e1-9b23-00025b00a5a5",),
     battery=80,
@@ -91,28 +91,24 @@ class EqProtocolTests(unittest.TestCase):
 
 class EqProfileTests(unittest.TestCase):
     def test_factory_presets_are_model_specific(self):
-        pro = PROFILES["060C14"].eq
-        pro_2 = PROFILES["062014"].eq
+        t310 = PROFILES["063C12"].eq
         self.assertEqual(
-            [(item.eq_id, item.name) for item in pro.presets],
-            [(0, "Balanced"), (1, "Deep Sea Bass"), (2, "Pure Vocals"),
-             (3, "Bright & Crisp")],
-        )
-        self.assertEqual(
-            [(item.eq_id, item.name) for item in pro_2.presets],
-            [(0, "Balanced"), (1, "Bass"), (2, "Serenade"), (3, "Bold"),
-             (7, "Hans Zimmer Soundscape Tuning")],
+            [(item.eq_id, item.name) for item in t310.presets],
+            [(0, "Balanced"), (1, "Clear Bass"), (2, "Clear Vocals"),
+             (3, "Bright")],
         )
 
-    def test_pro_2_accepts_current_and_legacy_preset_keys(self):
-        profile = PROFILES["062014"].eq
-        self.assertEqual(profile.preset_for("serenade").eq_id, 2)
+    def test_t310_accepts_current_and_legacy_preset_keys(self):
+        profile = PROFILES["063C12"].eq
+        self.assertEqual(profile.preset_for("bass").eq_id, 1)
+        self.assertEqual(profile.preset_for("bass-boost").eq_id, 1)
+        self.assertEqual(profile.preset_for("deep-sea-bass").eq_id, 1)
+        self.assertEqual(profile.preset_for("vocals").eq_id, 2)
         self.assertEqual(profile.preset_for("pure-vocals").eq_id, 2)
-        self.assertEqual(profile.preset_for("hans-zimmer-soundscape-tuning").eq_id, 7)
 
 
 class EqSessionTests(unittest.TestCase):
-    def session(self, product="062014"):
+    def session(self, product="063C12"):
         session = OpoSession(DEVICE, PROFILES[product])
         session._connected = session._authenticated = True
         session._transport = MagicMock()
@@ -183,7 +179,7 @@ class EqSessionTests(unittest.TestCase):
         self.assertEqual(commands.count(SET_EQ_DETAIL), 1)
 
     def test_unverified_custom_write_is_gated_before_transport(self):
-        session = self.session("060C14")
+        session = self.session("063C12")
         with self.assertRaises(ValueError):
             session.set_custom_eq(5, (0, 0, 0, 0, 0, 0))
         session._transport.request.assert_not_called()

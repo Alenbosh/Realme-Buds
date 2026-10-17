@@ -98,7 +98,7 @@ class PluginScaffoldTests(unittest.TestCase):
     def test_bar_model_is_capability_driven_and_rejects_invalid_battery(self):
         script = r'''
 const model = require(process.argv[1]);
-const snapshot = {status: {model: "OnePlus Buds Pro 2", battery: {
+const snapshot = {status: {model: "realme Buds T310", battery: {
   left: {percentage: 83, charging: false},
   right: {percentage: 41.6, charging: true},
   case: {percentage: null, charging: true},
@@ -106,7 +106,7 @@ const snapshot = {status: {model: "OnePlus Buds Pro 2", battery: {
 }}};
 const shown = model.presentation("connected", snapshot);
 if (shown.label !== "L 83%  R 42%⚡") process.exit(1);
-if (!shown.tooltip.includes("OnePlus Buds Pro 2") || !shown.tooltip.includes("Right: 42% (charging)")) process.exit(2);
+if (!shown.tooltip.includes("realme Buds T310") || !shown.tooltip.includes("Right: 42% (charging)")) process.exit(2);
 if (shown.tooltip.includes("Case:") || shown.label.includes("99")) process.exit(3);
 const zeroCaseSnapshot = {status: {model: "realme Buds T310", battery: {
   left: {percentage: 90, charging: false},
@@ -137,12 +137,12 @@ if (model.reportActionLabel({compatibility:"verified"}) !== "Report a problem") 
 if (model.reportActionLabel({compatibility:"community_tested"}) !== "Report a problem") process.exit(18);
 if (model.reportActionLabel({compatibility:"experimental"}) !== "Report compatibility") process.exit(19);
 const date = new Date(2026, 8, 16);
-if (model.reportFilename(snapshot, date) !== "oneplus-buds-pro-2-report-2026-09-16.txt") process.exit(20);
-if (model.reportFilename({status:{model:"OnePlus Nord Buds 3"}}, date) !== "oneplus-nord-buds-3-report-2026-09-16.txt") process.exit(21);
-if (model.reportFilename({status:{model:"Alice's OnePlus Buds / AA:BB:CC:DD:EE:FF"}}, date) !== "oneplus-buds-report-2026-09-16.txt") process.exit(22);
+if (model.reportFilename(snapshot, date) !== "realme-buds-t310-report-2026-09-16.txt") process.exit(20);
+if (model.reportFilename({status:{model:"realme Buds Air 6"}}, date) !== "realme-buds-air-6-report-2026-09-16.txt") process.exit(21);
+if (model.reportFilename({status:{model:"Alice's realme Buds / AA:BB:CC:DD:EE:FF"}}, date) !== "realme-buds-report-2026-09-16.txt") process.exit(22);
 if (model.reportFilename({status:{model:null}}, date) !== "realme-buds-report-2026-09-16.txt") process.exit(23);
 if (model.textReportUrl("file:///tmp/report.json") !== "file:///tmp/report.txt") process.exit(24);
-const issue = "https://github.com/Alenbosh/Realme-Buds/issues/new?template=compatibility.md&title=%5BCompatibility%5D%20OnePlus%20Buds%20Pro%202";
+const issue = "https://github.com/Alenbosh/Realme-Buds/issues/new?template=compatibility.md&title=%5BCompatibility%5D%20realme%20Buds%20T310";
 if (model.compatibilityIssueUrl(snapshot) !== issue) process.exit(25);
 if (model.compatibilityIssueUrl({status:{model:null}}) !== model.COMPATIBILITY_ISSUE_URL) process.exit(26);
 if (model.compatibilityIssueUrl(snapshot).includes("report=") || model.compatibilityIssueUrl(snapshot).includes("path=")) process.exit(27);

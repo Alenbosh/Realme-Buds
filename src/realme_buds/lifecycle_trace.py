@@ -9,7 +9,7 @@ _lock = Lock()
 
 
 def mark(phase: str, **fields: str | int | bool) -> None:
-    path = os.environ.get('ONEPLUS_BUDS_LIFECYCLE_TRACE')
+    path = os.environ.get('REALME_BUDS_LIFECYCLE_TRACE') or os.environ.get('ONEPLUS_BUDS_LIFECYCLE_TRACE')
     if not path:
         return
     record = dict(phase=phase, monotonic_ns=monotonic_ns(), unix_ns=time_ns(),

@@ -9,7 +9,7 @@ from realme_buds.session import OpoSession
 
 DEVICE = Device(
     address="AA:BB:CC:DD:EE:FF",
-    name="OnePlus Buds Pro 2",
+    name="realme Buds T310",
     connected=True,
     uuids=("0000079a-d102-11e1-9b23-00025b00a5a5",),
     battery=80,
@@ -26,7 +26,7 @@ class SessionTests(unittest.TestCase):
             }
         )
         with patch("realme_buds.session.RfcommTransport", return_value=transport):
-            with OpoSession(DEVICE, PROFILES["062014"]) as session:
+            with OpoSession(DEVICE, PROFILES["063C12"]) as session:
                 batch = session.authenticate_and_subscribe()
                 self.assertEqual(session.advertised_event_codes, (4, 6))
         self.assertEqual(batch.events[-1].kind, "notification")
@@ -40,7 +40,7 @@ class SessionTests(unittest.TestCase):
             Frame(0x9999, 2, b"secret"),
         ])
         with patch("realme_buds.session.RfcommTransport", return_value=transport):
-            with OpoSession(DEVICE, PROFILES["062014"]) as session:
+            with OpoSession(DEVICE, PROFILES["063C12"]) as session:
                 batch = session.poll()
         self.assertEqual(batch.events[0].kind, "battery")
         self.assertEqual(batch.events[0].data["left"]["percentage"], 100)
@@ -50,7 +50,7 @@ class SessionTests(unittest.TestCase):
     def test_poll_queries_battery_periodically_and_on_demand(self):
         transport = FakeTransport({})
         with patch("realme_buds.session.RfcommTransport", return_value=transport):
-            with OpoSession(DEVICE, PROFILES["062014"], battery_poll_interval=10.0) as session:
+            with OpoSession(DEVICE, PROFILES["063C12"], battery_poll_interval=10.0) as session:
                 # Initially not due
                 session.poll()
                 self.assertNotIn((0x0106, b""), transport.sent_queries)
@@ -62,13 +62,13 @@ class SessionTests(unittest.TestCase):
     def test_query_battery_returns_parsed_result(self):
         transport = FakeTransport({0x0106: [Frame(0x8106, 1, b"\x01\x50\x02\x50")]})
         with patch("realme_buds.session.RfcommTransport", return_value=transport):
-            with OpoSession(DEVICE, PROFILES["062014"]) as session:
+            with OpoSession(DEVICE, PROFILES["063C12"]) as session:
                 result = session.query_battery()
                 self.assertEqual(result["left"]["percentage"], 80)
                 self.assertEqual(result["right"]["percentage"], 80)
 
     def test_session_must_be_connected(self):
-        session = OpoSession(DEVICE, PROFILES["062014"])
+        session = OpoSession(DEVICE, PROFILES["063C12"])
         with self.assertRaisesRegex(RuntimeError, "not connected"):
             session.poll()
 
@@ -77,7 +77,7 @@ class SessionTests(unittest.TestCase):
             0x010D: [Frame(0x810D, 0, bytes.fromhex("00 02 04 01 28 01"))]
         })
         with patch("realme_buds.session.RfcommTransport", return_value=transport):
-            with OpoSession(DEVICE, PROFILES["062014"]) as session:
+            with OpoSession(DEVICE, PROFILES["063C12"]) as session:
                 switches = session.query_feature_switches()
                 self.assertEqual(switches, {"wear_detection": True, "game_mode": True})
 
@@ -86,7 +86,7 @@ class SessionTests(unittest.TestCase):
             0x0403: [Frame(0x8403, 1, b"\x00")]
         })
         with patch("realme_buds.session.RfcommTransport", return_value=transport):
-            with OpoSession(DEVICE, PROFILES["062014"]) as session:
+            with OpoSession(DEVICE, PROFILES["063C12"]) as session:
                 session._authenticated = True
                 success, batch = session.set_feature_switch("game_mode", True)
                 self.assertTrue(success)

@@ -13,7 +13,7 @@ from realme_buds.timing import AncRequestError
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--product', required=True, choices=('060C14', '062014'))
+    parser.add_argument('--product', required=True, help='Expected product ID, e.g. 063C12')
     parser.add_argument('--run', action='store_true', help='Authorize two Off → Transparency → On → Off cycles; ends Off')
     parser.add_argument('--reuse-session', action='store_true', help='Test persistent-session control')
     parser.add_argument('--service', action='store_true', help='Run concurrent service polling during measurements')

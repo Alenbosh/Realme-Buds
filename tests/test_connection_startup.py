@@ -46,7 +46,7 @@ class StartupTransport:
         if command == QUERY_PRODUCT_ID:
             return frame(self.fixture['rx_product'])
         if command == QUERY_BATTERY:
-            return frame(FIXTURES['buds_pro']['rx_battery'])
+            return frame(FIXTURES['buds_t310']['rx_battery'])
         if command == QUERY_ANC:
             return frame(self.fixture.get('rx_anc_off', self.fixture.get('rx_anc_transparency')))
         raise AssertionError(command)
@@ -60,41 +60,40 @@ class StartupTransport:
 
 
 class StartupTests(unittest.TestCase):
-    def test_one_socket_fresh_profile_and_deferred_firmware_both_models(self):
-        for fixture in FIXTURES['buds_pro'], FIXTURES['buds_pro_2']:
-            with self.subTest(product=fixture['product_id']):
-                transport = StartupTransport(fixture)
-                with patch('realme_buds.session.RfcommTransport', return_value=transport) as factory:
-                    session, status, initial = OpoSession.bootstrap(DEVICE)
-                factory.assert_called_once()
-                self.assertEqual(transport.enters, 1)
-                self.assertEqual(transport.exits, 0)
-                self.assertEqual(status.product_id, fixture['product_id'])
-                self.assertEqual(session.profile.product_id, fixture['product_id'])
-                self.assertTrue(session._authenticated)
-                self.assertEqual(transport.raw_waits, [2.0, 1.5])
-                self.assertEqual(transport.queries.count(0x0100), 1)
-                self.assertTrue(status.battery)
-                self.assertIsNotNone(status.anc)
-                self.assertIsNone(status.firmware_version)
-                self.assertNotIn(QUERY_REMOTE_VERSION, transport.queries)
-                self.assertNotIn(0x0200, transport.queries)
-                self.assertEqual(transport.optional, [])
-                controller = BudsController()
-                controller._status = status
-                controller._session = session
-                controller._running = True
-                snapshot = controller.poll(0)
-                self.assertIsNotNone(snapshot.status.firmware_version)
-                self.assertIn(0x0200, transport.queries)
-                self.assertEqual(transport.optional, [QUERY_REMOTE_VERSION])
-                controller.poll(0)
-                self.assertEqual(transport.optional, [QUERY_REMOTE_VERSION])
-                controller.shutdown()
-                self.assertEqual(transport.exits, 1)
+    def test_one_socket_fresh_profile_and_deferred_firmware(self):
+        fixture = FIXTURES['buds_t310']
+        transport = StartupTransport(fixture)
+        with patch('realme_buds.session.RfcommTransport', return_value=transport) as factory:
+            session, status, initial = OpoSession.bootstrap(DEVICE)
+        factory.assert_called_once()
+        self.assertEqual(transport.enters, 1)
+        self.assertEqual(transport.exits, 0)
+        self.assertEqual(status.product_id, fixture['product_id'])
+        self.assertEqual(session.profile.product_id, fixture['product_id'])
+        self.assertTrue(session._authenticated)
+        self.assertEqual(transport.raw_waits, [2.0, 1.5])
+        self.assertEqual(transport.queries.count(0x0100), 1)
+        self.assertTrue(status.battery)
+        self.assertIsNotNone(status.anc)
+        self.assertIsNone(status.firmware_version)
+        self.assertNotIn(QUERY_REMOTE_VERSION, transport.queries)
+        self.assertNotIn(0x0200, transport.queries)
+        self.assertEqual(transport.optional, [])
+        controller = BudsController()
+        controller._status = status
+        controller._session = session
+        controller._running = True
+        snapshot = controller.poll(0)
+        self.assertIsNotNone(snapshot.status.firmware_version)
+        self.assertIn(0x0200, transport.queries)
+        self.assertEqual(transport.optional, [QUERY_REMOTE_VERSION])
+        controller.poll(0)
+        self.assertEqual(transport.optional, [QUERY_REMOTE_VERSION])
+        controller.shutdown()
+        self.assertEqual(transport.exits, 1)
 
     def test_failure_closes_bootstrap_socket(self):
-        transport = StartupTransport(FIXTURES['buds_pro'])
+        transport = StartupTransport(FIXTURES['buds_t310'])
         transport.request = lambda *args, **kwargs: (_ for _ in ()).throw(TimeoutError('missing'))
         with patch('realme_buds.session.RfcommTransport', return_value=transport):
             with self.assertRaises(TimeoutError):
@@ -119,7 +118,7 @@ class AvailabilityTests(unittest.TestCase):
 
     def test_only_new_compatible_availability_wakes_retry(self):
         watcher = BlueZAvailability()
-        props = {'Name': 'OnePlus Buds Pro', 'Connected': False,
+        props = {'Name': 'realme Buds T310', 'Connected': False,
                  'UUIDs': ['00001107-d102-11e1-9b23-00025b00a5a5']}
         watcher.added('/a', {DEVICE_INTERFACE: props})
         self.assertEqual(watcher.token(), 0)
@@ -139,7 +138,7 @@ class AvailabilityTests(unittest.TestCase):
 
     def test_late_uuids_can_make_a_connected_device_eligible(self):
         watcher = BlueZAvailability()
-        watcher.changed(DEVICE_INTERFACE, {'Name': 'OnePlus Buds Pro', 'Connected': True}, [], '/a')
+        watcher.changed(DEVICE_INTERFACE, {'Name': 'realme Buds T310', 'Connected': True}, [], '/a')
         self.assertEqual(watcher.token(), 0)
         watcher.changed(DEVICE_INTERFACE, {'UUIDs': list(DEVICE.uuids)}, [], '/a')
         self.assertEqual(watcher.token(), 1)
@@ -147,7 +146,7 @@ class AvailabilityTests(unittest.TestCase):
     def test_alias_is_accepted_when_bluez_name_is_absent(self):
         watcher = BlueZAvailability()
         watcher.added('/a', {DEVICE_INTERFACE: {
-            'Alias': 'OnePlus Buds Pro',
+            'Alias': 'realme Buds T310',
             'Connected': True,
             'UUIDs': list(DEVICE.uuids),
         }})

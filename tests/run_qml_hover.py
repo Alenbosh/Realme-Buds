@@ -10,8 +10,8 @@ import subprocess
 import tempfile
 
 root = Path(__file__).resolve().parents[1]
-runner = shutil.which("qmltestrunner") or "/usr/lib/qt6/bin/qmltestrunner"
-with tempfile.TemporaryDirectory(prefix="oneplus-hover-") as directory:
+runner = "/usr/lib/qt6/bin/qmltestrunner" if Path("/usr/lib/qt6/bin/qmltestrunner").exists() else (shutil.which("qmltestrunner") or "")
+with tempfile.TemporaryDirectory(prefix="realme-hover-") as directory:
     staging = Path(directory)
     shutil.copytree(root / "tests/qml", staging, dirs_exist_ok=True)
     for name in ("BarWidget.qml", "BarModel.js"):

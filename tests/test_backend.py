@@ -10,7 +10,7 @@ from realme_buds.protocol import QUERY_ANC, QUERY_BATTERY, QUERY_BROADCAST_CODES
 
 DEVICE = Device(
     address="AA:BB:CC:DD:EE:FF",
-    name="OnePlus Buds Pro 2",
+    name="realme Buds T310",
     connected=True,
     uuids=("0000079a-d102-11e1-9b23-00025b00a5a5",),
     battery=80,
@@ -19,31 +19,30 @@ DEVICE = Device(
 )
 STATUS_RESULT = StatusResult(
     device=DEVICE,
-    product_id="062014",
-    model="OnePlus Buds Pro 2",
+    product_id="063C12",
+    model="realme Buds T310",
     remote_version=(VersionRecord(1, 2, "123"), VersionRecord(2, 2, "123")),
     firmware_version="123.123",
     battery={"left": {"percentage": 80, "charging": False}},
     anc="on",
-    anc_level="smart",
+    anc_level=None,
 )
 
 
 class BackendTests(unittest.TestCase):
-    def test_firmware_capability_is_verified_on_both_reference_models(self):
-        self.assertIn("firmware", PROFILES["060C14"].capabilities)
-        self.assertIn("firmware", PROFILES["062014"].capabilities)
+    def test_firmware_capability_is_verified_on_reference_model(self):
+        self.assertIn("firmware", PROFILES["063C12"].capabilities)
 
     @patch("realme_buds.backend.query_feature_switches", return_value={"wear_detection": True})
     @patch("realme_buds.backend.read_status", return_value=STATUS_RESULT)
     def test_capabilities_combine_profile_and_device_switches(self, _status, _switches):
         result = query_capabilities()
         self.assertEqual(result["compatibility"], "verified")
-        self.assertIn("smart_anc", result["capabilities"])
+        self.assertIn("anc", result["capabilities"])
         self.assertNotIn("adaptive_anc", result["capabilities"])
         self.assertIn("wear_detection", result["capabilities"])
         self.assertEqual(result["feature_switches"], {"wear_detection": True})
-        self.assertIn("smart", result["anc_modes"])
+        self.assertIn("transparency", result["anc_modes"])
 
     @patch("realme_buds.backend.select_device", return_value=DEVICE)
     def test_feature_switch_probe_subscribes_only_to_advertised_codes(self, _device):
@@ -67,12 +66,12 @@ class BackendTests(unittest.TestCase):
         rendered = repr(report)
         self.assertNotIn(DEVICE.address, rendered)
         self.assertNotIn("reported_name", report["device"])
-        self.assertEqual(report["device"]["product_id"], "062014")
+        self.assertEqual(report["device"]["product_id"], "063C12")
         self.assertEqual(report["device"]["firmware_version"], "123.123")
         self.assertTrue(report["connection"]["services_resolved"])
         self.assertEqual(report["device"]["compatibility"], "verified")
         self.assertEqual(report["device"]["protocol_family"], "OPOv1/0xAA")
-        self.assertEqual(report["state"]["anc_level"], "smart")
+        self.assertIsNone(report["state"]["anc_level"])
         self.assertIn("address", report["privacy"].lower())
 
     @patch("realme_buds.backend.select_device", return_value=DEVICE)
@@ -80,29 +79,29 @@ class BackendTests(unittest.TestCase):
         transport = FakeTransport(
             {
                 QUERY_CAPABILITIES: [],
-                QUERY_PRODUCT_ID: [Frame(0x8103, 1, b"\x00\x14\x20\x06")],
+                QUERY_PRODUCT_ID: [Frame(0x8103, 1, b"\x00\x12\x3c\x06")],
                 QUERY_REMOTE_VERSION: [
                     Frame(0x8105, 2, b"\x00\x02" + b"1,2,123,2,2,123")
                 ],
                 QUERY_BATTERY: [Frame(0x8106, 2, b"\x02\x01\x50\x02\x4f")],
-                QUERY_ANC: [Frame(0x810C, 3, bytes.fromhex("00 01 01 80"))],
+                QUERY_ANC: [Frame(0x810C, 3, bytes.fromhex("00 01 01 04"))],
             }
         )
         with patch("realme_buds.backend.RfcommTransport", return_value=transport):
             result = read_status()
         self.assertIsInstance(result, StatusResult)
-        self.assertEqual(result.product_id, "062014")
+        self.assertEqual(result.product_id, "063C12")
         self.assertEqual(result.remote_version[0].value, "123")
         self.assertEqual(result.firmware_version, "123.123")
         self.assertEqual(result.battery["left"]["percentage"], 80)
-        self.assertEqual((result.anc, result.anc_level), ("on", "smart"))
+        self.assertEqual((result.anc, result.anc_level), ("on", None))
 
     @patch("realme_buds.backend.select_device", return_value=DEVICE)
     def test_nonzero_set_status_still_requires_matching_verification(self, _device):
         control = FakeTransport(
             {
                 QUERY_CAPABILITIES: [],
-                QUERY_PRODUCT_ID: [Frame(0x8103, 1, b"\x00\x14\x20\x06")],
+                QUERY_PRODUCT_ID: [Frame(0x8103, 1, b"\x00\x12\x3c\x06")],
                 SET_ANC: [Frame(0x8404, 2, b"\x0e")],
             }
         )

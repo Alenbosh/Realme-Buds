@@ -23,7 +23,7 @@ class TimingTests(unittest.TestCase):
     @patch('realme_buds.backend.select_device', return_value=DEVICE)
     def test_backend_times_independent_verification_and_rejects_mismatch(self, _device):
         for state, succeeds in [(b'\x00\x01\x01\x01', True), (b'\x00\x01\x01\x02', False)]:
-            control = FakeTransport({QUERY_PRODUCT_ID: [Frame(0x8103, 1, b'\x00\x14\x20\x06')],
+            control = FakeTransport({QUERY_PRODUCT_ID: [Frame(0x8103, 1, b'\x00\x12\x3c\x06')],
                                      SET_ANC: [Frame(0x8404, 2, b'\x00')]})
             verifier = FakeTransport({QUERY_ANC: [Frame(0x810c, 3, state)]})
             with patch('realme_buds.backend.RfcommTransport', side_effect=[control, verifier]) as factory:

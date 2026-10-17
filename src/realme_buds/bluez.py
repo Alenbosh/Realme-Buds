@@ -30,7 +30,7 @@ class Device:
     @property
     def looks_compatible(self) -> bool:
         brand = self.name.lower()
-        return any(brand_name in brand for brand_name in ("oneplus", "oppo", "realme")) and bool(
+        return "realme" in brand and bool(
             OPO_UUIDS.intersection(self.uuids)
         )
 
@@ -78,11 +78,12 @@ def select_device(address: str | None = None) -> Device:
         selected = next((device for device in matches if device.address.upper() == normalized), None)
         if selected is None:
             raise RuntimeError(
-                f"selected device {address} is not a connected compatible OnePlus/OPPO/realme device"
+                f"selected device {address} is not a connected compatible realme device"
             )
         return selected
     if not matches:
-        raise RuntimeError("no connected OPO-compatible OnePlus/OPPO/realme earbuds found")
+        raise RuntimeError("no connected compatible realme earbuds found")
+
     if len(matches) > 1:
         raise RuntimeError("multiple compatible devices connected; select one with --device ADDRESS")
     return matches[0]

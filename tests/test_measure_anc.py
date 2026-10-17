@@ -19,7 +19,7 @@ spec.loader.exec_module(measure_anc)
 
 
 class MeasurementTests(unittest.TestCase):
-    def run_measurement(self, controller, product='062014', reuse=False):
+    def run_measurement(self, controller, product='063C12', reuse=False):
         output = io.StringIO()
         with patch.object(measure_anc, 'BudsController', return_value=controller), \
              patch('sys.argv', ['measure_anc.py', '--product', product, '--run'] + (['--reuse-session'] if reuse else [])), \
@@ -40,7 +40,7 @@ class MeasurementTests(unittest.TestCase):
         controller = Mock()
         controller.start.return_value.status = STATUS_RESULT
         controller.start.return_value.advertised_event_codes = (1, 2)
-        code, _ = self.run_measurement(controller, '060C14')
+        code, _ = self.run_measurement(controller, '069999')
         self.assertEqual(code, 1)
         controller.set_anc.assert_not_called()
         controller.shutdown.assert_called_once()
@@ -61,7 +61,7 @@ class MeasurementTests(unittest.TestCase):
         controller = Mock()
         controller.start.return_value = SNAPSHOT
         controller.snapshot.return_value = SNAPSHOT
-        controller.set_anc.return_value = ControlResult('test', '062014', 'off', None, 0, True)
+        controller.set_anc.return_value = ControlResult('test', '063C12', 'off', None, 0, True)
         sleeps = []
         def listening_pause(_seconds):
             sleeps.append(True)

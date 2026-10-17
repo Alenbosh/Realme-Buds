@@ -17,15 +17,15 @@ from realme_buds.service import ServiceState
 
 DEVICE = Device(
     address="AA:BB:CC:DD:EE:FF",
-    name="OnePlus Buds Pro 2",
+    name="realme Buds T310",
     connected=True,
     uuids=("0000079a-d102-11e1-9b23-00025b00a5a5",),
     battery=80,
 )
 STATUS = StatusResult(
     device=DEVICE,
-    product_id="062014",
-    model="OnePlus Buds Pro 2",
+    product_id="063C12",
+    model="realme Buds T310",
     remote_version=(),
     firmware_version="196.196.101",
     battery={"left": {"percentage": 80, "charging": False}},
@@ -43,7 +43,7 @@ SNAPSHOT = ControllerSnapshot(
     generation=2,
 )
 EQ_STATUS = EqStatusResult(
-    DEVICE.name, "062014", DEVICE.name, 4, "Custom", "custom",
+    DEVICE.name, "063C12", DEVICE.name, 4, "Custom", "custom",
     ({"id": 0, "key": "balanced", "name": "Balanced"},),
     (EqEntry(4, "Custom", True, -6, 6, (EqBand(62, 3),)),), 1,
 )
@@ -59,7 +59,7 @@ class BridgeTests(unittest.TestCase):
         payload = serialize_snapshot(SNAPSHOT)
         encoded = json.dumps(payload)
         self.assertNotIn(DEVICE.address, encoded)
-        self.assertEqual(payload["status"]["model"], "OnePlus Buds Pro 2")
+        self.assertEqual(payload["status"]["model"], "realme Buds T310")
         self.assertEqual(payload["advertised_event_codes"], [1, 2])
         self.assertEqual(payload["feature_switches"], {"multipoint": True})
         self.assertEqual(payload["compatibility"], "verified")
@@ -67,13 +67,12 @@ class BridgeTests(unittest.TestCase):
         self.assertIn("multipoint", payload["capabilities"])
         self.assertIn("transparency", payload["anc_modes"])
 
-    def test_only_two_reference_models_are_hardware_verified(self):
-        self.assertEqual(PROFILES["060C14"].compatibility, "verified")
-        self.assertEqual(PROFILES["062014"].compatibility, "verified")
+    def test_reference_model_is_hardware_verified(self):
+        self.assertEqual(PROFILES["063C12"].compatibility, "verified")
         self.assertFalse(any(
             profile.compatibility == "verified"
             for product_id, profile in PROFILES.items()
-            if product_id not in {"060C14", "062014", "063C12"}
+            if product_id not in {"063C12", "063C13"}
         ))
 
     def test_unknown_recognised_product_is_experimental(self):
@@ -85,7 +84,7 @@ class BridgeTests(unittest.TestCase):
 
     def test_community_tested_profile_has_distinct_state_without_verified_writes(self):
         community = replace(
-            PROFILES["062014"], product_id="C0FFEE", name="Community model",
+            PROFILES["063C12"], product_id="C0FFEE", name="Community model",
             compatibility="community_tested",
         )
         status = replace(STATUS, product_id="C0FFEE", model="Community model")
@@ -216,7 +215,7 @@ class BridgeTests(unittest.TestCase):
             report = json.loads(destination.read_text())
         self.assertTrue(response["ok"])
         self.assertEqual(response["result"]["filename"], "compatibility.json")
-        self.assertEqual(report["device"]["product_id"], "062014")
+        self.assertEqual(report["device"]["product_id"], "063C12")
         self.assertEqual(controller.refreshes, 0)
         self.assertEqual(controller.anc_modes, [])
         self.assertEqual(controller.eq_targets, [])
@@ -249,7 +248,7 @@ class FakeController:
         self.anc_modes.append(mode)
         return ControlResult(
             name=DEVICE.name,
-            product_id="062014",
+            product_id="063C12",
             anc=mode,
             anc_level=None,
             set_status=0,
@@ -265,11 +264,11 @@ class FakeController:
 
     def set_eq(self, preset):
         self.eq_targets.append(preset)
-        return EqControlResult(DEVICE.name, "062014", 0, "Balanced", 4, "Custom", 0, True)
+        return EqControlResult(DEVICE.name, "063C12", 0, "Balanced", 4, "Custom", 0, True)
 
     def set_custom_eq(self, entry_id, gains):
         self.custom_targets.append((entry_id, gains))
-        return EqControlResult(DEVICE.name, "062014", entry_id, "Custom", 0, "Balanced", 0, True)
+        return EqControlResult(DEVICE.name, "063C12", entry_id, "Custom", 0, "Balanced", 0, True)
 
 
 class FakeRunner:

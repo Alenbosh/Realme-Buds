@@ -35,17 +35,16 @@ the MIT notice, Copyright (c) 2026 Alen(Manish) and contributors.
 
 Maintainer notes:
 
-> Native Omarchy service/bar widget for realme and OnePlus earbuds, with a Python backend
-> using BlueZ D-Bus and Bluetooth Classic RFCOMM. realme Buds T310, OnePlus Buds Pro and Buds Pro 2 battery,
-> firmware, noise controls, and model-appropriate native EQ are hardware-verified. Requires system
+> Native Omarchy service/bar widget for realme earbuds, with a Python backend
+> using BlueZ D-Bus and Bluetooth Classic RFCOMM. realme Buds T310 battery,
+> firmware, noise controls, and native hardware EQ are hardware-verified. Requires system
 > Python 3.11+, python-dbus and BlueZ. No PyPI runtime dependencies or install
 > hooks. One helper follows plugin lifecycle inside the existing shell; no second
 > Quickshell instance. Only advertised verified controls are exposed. Installation
-> and removal use Omarchy commands. Other recognised OnePlus/OPO-compatible
-> devices are explicitly labelled Experimental and can generate a local,
-> privacy-safe compatibility report. Verified and Community Tested devices can
-> generate the same report without showing an Experimental warning. The project
-> is independent of OnePlus/OPPO.
+> and removal use Omarchy commands. Other recognised realme earbuds
+> are labelled Experimental and can generate a local, privacy-safe compatibility report.
+> Verified and Community Tested devices can generate the same report without showing
+> an Experimental warning. The project is an independent community plugin.
 
 Submission is through the [marketplace issue form](https://github.com/omacom/omarchy-plugin-marketplace/issues/new?template=submit-plugin.yml)
 or the documented CLI issue format. It requires a public repository, one category,

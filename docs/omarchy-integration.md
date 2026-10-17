@@ -28,12 +28,12 @@ Use a combined schema-v1 `service` + `bar-widget` plugin. Its headless QML servi
 
 ```text
 omarchy-shell (existing process)
-  ├─ OnePlus service QML
+  ├─ realme service QML
   │    └─ one Python bridge-host child
   │         └─ BudsFrontendBridge
   │              └─ BudsServiceRunner
   │                   └─ BudsController (sole RFCOMM owner)
-  └─ OnePlus bar widget / popup
+  └─ realme bar widget / popup
        └─ reads service state and submits commands to the service
 ```
 
@@ -51,7 +51,7 @@ An in-QML backend was rejected because Quickshell's generic Bluetooth API does n
 
 ## Adapter implementation
 
-`python -m oneplus_buds.bridge_host` implements the selected process boundary. It:
+`python3 -m realme_buds.bridge_host` implements the selected process boundary. It:
 
 - starts the bridge/service lifecycle in one non-daemon worker;
 - reads NDJSON commands on a separate daemon reader so signals are not trapped behind blocking stdin;
@@ -69,10 +69,10 @@ Automated lifecycle tests use fake bridges and no Bluetooth hardware. They cover
 
 The repository root is now directly installable as an Omarchy plugin checkout:
 
-- `manifest.json` declares `oneplus-buds.control` as a combined `service` and `bar-widget`, defaulting to the right section.
-- `oneplus-buds-bridge` is an executable checkout-local launcher that imports the bundled `src/` tree. This avoids relying on an install hook or prior Python-package installation.
+- `manifest.json` declares `realme-buds.control` as a combined `service` and `bar-widget`, defaulting to the right section.
+- `realme-buds-bridge` is an executable checkout-local launcher that imports the bundled `src/` tree. This avoids relying on an install hook or prior Python-package installation.
 - `Service.qml` starts exactly one bidirectional helper after the shell injects the manifest source directory. It parses schema-v1 lines through `BridgeModel.js`, exposes primitive connection/snapshot/response state, sends refresh and ANC requests over stdin, suppresses raw stderr, and stops the helper when unloaded.
-- `BarWidget.qml` resolves the shared service through `bar.shell.serviceFor("oneplus-buds.control")` but remains invisible and zero-width. It exists only to prove the combined plugin shape before visual work begins.
+- `BarWidget.qml` resolves the shared service through `bar.shell.serviceFor("realme-buds.control")` but remains invisible and zero-width. It exists only to prove the combined plugin shape before visual work begins.
 
 `omarchy plugin validate .` passes. The Python suite covers the manifest, executable launcher, one-helper constraint, shared-service lookup, hidden placeholder, and JavaScript parser/reducer. Direct launcher EOF testing emits valid lifecycle NDJSON and exits cleanly.
 

@@ -5,7 +5,7 @@ Status: pre-UI backend boundary, verified 2026-09-05.
 `BudsBackend` is the stable typed entry point for future integrations. Existing dictionary-returning functions remain as compatibility wrappers for the JSON CLI.
 
 ```python
-from oneplus_buds import BudsBackend
+from realme_buds import BudsBackend
 
 backend = BudsBackend()
 devices = backend.discover()          # cheap BlueZ D-Bus snapshot
@@ -47,7 +47,7 @@ Current limitation: asynchronous `0x0204` payload schemas are not sufficiently v
 `BudsController` is the UI-independent state owner above `BudsBackend`:
 
 ```python
-from oneplus_buds import BudsController
+from realme_buds import BudsController
 
 controller = BudsController()
 snapshot = controller.start()
@@ -68,7 +68,7 @@ Safe battery, ANC, and named feature-switch events update cached typed state. Re
 
 ```python
 from threading import Event
-from oneplus_buds import BudsServiceRunner
+from realme_buds import BudsServiceRunner
 
 cancelled = Event()
 runner = BudsServiceRunner(

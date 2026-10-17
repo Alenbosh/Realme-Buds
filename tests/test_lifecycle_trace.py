@@ -12,7 +12,7 @@ class TraceTests(unittest.TestCase):
     def test_opt_in_trace_has_correlatable_timestamps_and_failure_boundary(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'trace.jsonl'
-            with patch.dict(os.environ, {'ONEPLUS_BUDS_LIFECYCLE_TRACE': str(path)}):
+            with patch.dict(os.environ, {'REALME_BUDS_LIFECYCLE_TRACE': str(path)}):
                 with span('query', command=262):
                     pass
                 with self.assertRaises(RuntimeError):
@@ -27,7 +27,7 @@ class TraceTests(unittest.TestCase):
             self.assertNotIn('sensitive', path.read_text())
 
     def test_unwritable_trace_does_not_break_connections(self):
-        with patch.dict(os.environ, {'ONEPLUS_BUDS_LIFECYCLE_TRACE': '/nonexistent/trace.jsonl'}):
+        with patch.dict(os.environ, {'REALME_BUDS_LIFECYCLE_TRACE': '/nonexistent/trace.jsonl'}):
             mark('test')
 
 class ReportTests(unittest.TestCase):

@@ -1,18 +1,17 @@
-# realme & OnePlus Buds Control for Omarchy
+# realme Buds Control for Omarchy
 
-A native Omarchy bar widget and Linux backend for realme and OnePlus earbuds. Check battery
-levels and change noise control from a compact, theme-aware panel.
+A native Omarchy bar widget and Linux backend for realme earbuds. Check battery
+levels, switch noise control modes, and tweak native EQ presets from a compact, theme-aware panel.
 
-**Status: 0.1.0 release candidate.** realme Buds T310, OnePlus Buds Pro, and OnePlus Buds Pro 2
-have hardware-verified basic controls and native EQ. No release tag has been created yet.
-This is an independent project, unaffiliated with realme, OnePlus, or OPPO.
+**Status: 0.1.0 release candidate.** realme Buds T310 has hardware-verified basic controls and native EQ.
+This is an independent project, unaffiliated with realme or OPPO.
 
 ## What works
 
-- Automatic selection of one connected compatible realme/OnePlus/OPPO device.
+- Automatic selection of one connected compatible realme device.
 - Connection status, left/right battery, case battery when returned, and firmware.
-- Independently verified ANC On, Off, Transparency and profile-supported strengths.
-- Model-correct native earbud EQ presets on realme Buds T310, OnePlus Buds Pro, and Buds Pro 2, plus device-defined custom EQ on Pro 2.
+- Independently verified ANC On, Off, and Transparency.
+- Model-correct native earbud EQ presets on realme Buds T310 (Balanced, Clear Bass, Clear Vocals, Bright).
 - Icon-only idle widget; hover reveals known batteries (with charging indicators), with delayed collapse.
 - Responsive panel with full-width device status, balanced ANC/EQ columns when
   space permits, and a compact scrolling fallback on narrow displays.
@@ -21,20 +20,18 @@ This is an independent project, unaffiliated with realme, OnePlus, or OPPO.
 | Device | Product ID | Evidence | Tested firmware | ANC / Noise Control | EQ Presets |
 |---|---|---|---|---|---|
 | realme Buds T310 | `063C12` | Verified on hardware | 1.1.0.47 | Off, Transparency, ANC On | Balanced, Clear Bass, Clear Vocals, Bright |
-| OnePlus Buds Pro | `060C14` | Verified on hardware | 541.541.510 | Off, Transparency, ANC (Light, Deep, Smart) | Balanced, Deep Sea Bass, Pure Vocals, Bright & Crisp |
-| OnePlus Buds Pro 2 | `062014` | Verified on hardware | 196.196.101 | Off, Transparency, ANC (Light, Medium, Deep, Smart) | 5 Presets + 6-band Custom EQ |
-| Other compatible realme/OnePlus/OPPO devices | Unknown | Experimental if recognised | Unknown | Not exposed | Not exposed |
+| Other realme earbuds | Unknown | Experimental if recognised | Unknown | Not exposed | Not exposed |
 
 See [compatibility and limitations](docs/devices/compatibility.md). Gestures,
-spatial audio and other HeyMelody/Realme Link features are not implemented controls.
+spatial audio and other Realme Link features are not implemented controls.
 
 ## Compatibility and reports
 
-realme Buds T310, OnePlus Buds Pro, and OnePlus Buds Pro 2 are hardware-verified
-on reference devices. Other recognised realme/OnePlus/OPPO-compatible models are
+realme Buds T310 is hardware-verified on reference devices. Other recognised realme models are
 **Experimental** until tested. A model may become **Community Tested** after an
 owner reports successful, reproducible checks on their own hardware; that label
 does not mean maintainer hardware verification.
+
 
 Every connected device has a quiet reporting link at the bottom of the control
 panel. Verified and Community Tested devices show **Report a problem**;
@@ -127,28 +124,23 @@ A pending request is shown until verified; an acknowledgement alone never produc
 success message.
 
 Wear the earbuds for ANC tests: devices in their case may reject changes. For realme
-Buds T310, Off, Transparency, and ANC On modes are supported. For OnePlus Buds Pro and
-Buds Pro 2, specific ANC strengths (Light, Medium, Deep, Smart) can also be selected.
+Buds T310, Off, Transparency, and ANC On modes are supported.
 Warm main mode changes reuse the authenticated session; recorded timings are in
 [the measurement notes](docs/measurements/anc-baseline.md).
 Native EQ controls live only in the opened panel. Verified factory presets are displayed
 for supported models: realme Buds T310 provides Balanced, Clear Bass, Clear Vocals, and
-Bright; OnePlus Buds Pro provides Balanced, Deep Sea Bass, Pure Vocals, and Bright & Crisp;
-OnePlus Buds Pro 2 provides Balanced, Bass, Serenade, Bold, and Hans Zimmer Soundscape
-Tuning, plus controls generated from its returned custom-band definition. Changes are
-written to the earbuds and persist independently of the Linux audio route—no system-wide
-software EQ is installed or configured.
+Bright. Changes are written to the earbuds and persist independently of the Linux
+audio route—no system-wide software EQ is installed or configured.
 Connection startup uses BlueZ availability notifications while retaining bounded
 retry fallback; phase-by-phase results are in the
 [connection lifecycle measurements](docs/measurements/connection-lifecycle.md).
 
 ## CLI and diagnostic reports
 
-The included executable needs no package installation. Both `./realme-buds` and
-`./oneplus-buds` (compatibility link) commands are provided. **Disable the plugin before
-running CLI queries or diagnostics**: both use the device's single RFCOMM control
-channel (channel 1 on realme Buds T310; channel 15 on OnePlus Buds Pro). Re-enable
-afterward to resume monitoring.
+The included executable needs no package installation. The `./realme-buds`
+command is provided. **Disable the plugin before running CLI queries or diagnostics**:
+both use the device's single RFCOMM control channel (channel 1 on realme Buds T310).
+Re-enable afterward to resume monitoring.
 
 ```bash
 omarchy plugin disable realme-buds.control

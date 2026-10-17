@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.1.0 release candidate
 
+- Refocused codebase exclusively on realme Buds devices (hardware-verified on realme Buds T310).
+- Purged all legacy OnePlus device profiles, presets, launchers, and discovery filters.
+- Modularized device profiles with dynamic DeviceRegistry architecture for scaling realme models.
+
 - Refresh battery state when the panel opens and poll it periodically on the
   running authenticated session, without reopening Bluetooth.
 - Ignore a disconnected-case zero reading so the bar and tooltip do not show a

@@ -51,8 +51,8 @@ tests. Hardware timing scripts are explicit integration tools, not unit tests:
 `scripts/measure_anc.py` changes settings and must not run alongside the plugin.
 
 For a packaging check, export to a new directory with
-`python3 scripts/export_plugin.py /tmp/oneplus-review`, validate the export, then
-run its `./oneplus-buds --help`. Never publish local caches or private captures.
+`python3 scripts/export_plugin.py /tmp/realme-review`, validate the export, then
+run its `./realme-buds --help`. Never publish local caches or private captures.
 Live UI testing uses the existing shell and a unique temporary source path when
 QML caching requires it; back up configuration, then disable/remove the test
 plugin and restore the original configuration afterward. Never restart the user's

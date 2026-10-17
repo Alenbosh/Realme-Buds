@@ -127,9 +127,7 @@ function safeReportModel(snapshot) {
   var status = snapshot && snapshot.status
   var model = status && status.model ? String(status.model).trim() : ""
   if (!model || model.length > 60) return ""
-  if (!/^oneplus\b.*\bbuds\b/i.test(model)
-      && !/^oppo\b.*\b(?:buds|enco)\b/i.test(model)
-      && !/^realme\b.*\bbuds\b/i.test(model)) return ""
+  if (!/^realme\b.*\bbuds\b/i.test(model)) return ""
   if (!/^[A-Za-z0-9][A-Za-z0-9 .()+_-]*$/.test(model)) return ""
   if (/(?:[0-9a-f]{2}:){5}[0-9a-f]{2}/i.test(model)
       || /\b[0-9a-f]{6,}\b/i.test(model)) return ""
@@ -145,8 +143,7 @@ function reportFilename(snapshot, date) {
   var slug = model.toLowerCase().replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
   if (!slug) {
-    var raw = String(snapshot && snapshot.status && snapshot.status.model || "").toLowerCase()
-    slug = raw.indexOf("oneplus") !== -1 ? "oneplus-buds" : (raw.indexOf("oppo") !== -1 ? "oppo-buds" : "realme-buds")
+    slug = "realme-buds"
   }
   return slug + "-report-" + year + "-" + month + "-" + day + ".txt"
 }

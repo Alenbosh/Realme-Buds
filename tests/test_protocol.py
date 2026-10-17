@@ -37,14 +37,14 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(decode_frame(encoded), Frame(0x010C, 0x42, b"\x01\x01"))
 
     def test_stream_handles_fragmented_and_concatenated_frames(self):
-        first = encode_frame(0x8103, 1, b"\x00\x14\x0c\x06")
+        first = encode_frame(0x8103, 1, b"\x00\x12\x3c\x06")
         second = encode_frame(0x8106, 2, b"\x01\x64\x02\xe3")
         stream = FrameStream()
         self.assertEqual(stream.feed(first[:4]), [])
         self.assertEqual(stream.feed(first[4:] + second), [decode_frame(first), decode_frame(second)])
 
     def test_parsers(self):
-        self.assertEqual(parse_product_id(Frame(0x8103, 1, b"\x00\x14\x0c\x06")), "060C14")
+        self.assertEqual(parse_product_id(Frame(0x8103, 1, b"\x00\x12\x3c\x06")), "063C12")
         self.assertEqual(
             parse_battery(Frame(0x8106, 1, b"\x01\x64\x02\xe3\x03\x32")),
             {
@@ -53,7 +53,7 @@ class ProtocolTests(unittest.TestCase):
                 "case": {"percentage": 50, "charging": False},
             },
         )
-        self.assertEqual(parse_anc(Frame(0x810C, 1, b"\x01\x01\x04"), PROFILES["060C14"].anc), "on")
+        self.assertEqual(parse_anc(Frame(0x810C, 1, b"\x01\x01\x04"), PROFILES["063C12"].anc), "on")
 
     def test_remote_version_parser(self):
         payload = b"\x00\x03" + b"1,1,11,1,2,541,1,3,541"
@@ -117,7 +117,7 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(FEATURE_SWITCH_IDS["wear_detection"], FEATURE_WEAR_DETECTION)
 
 
-    def test_observed_buds_pro_responses(self):
+    def test_observed_t310_responses(self):
         capability = bytes.fromhex("aa0d0000008101050000bf17682604")
         self.assertEqual(decode_frame(capability).command, 0x8100)
         battery = decode_frame(bytes.fromhex("aa0f00000681030800000302e401e40350"))
@@ -145,11 +145,11 @@ class ProtocolTests(unittest.TestCase):
         frames = stream.feed(subscribed)
         self.assertEqual([frame.command for frame in frames], [0x8205, 0x0204])
 
-    def test_buds_pro_anc_set_frames(self):
-        anc = PROFILES["060C14"].anc
+    def test_t310_anc_set_frames(self):
+        anc = PROFILES["063C12"].anc
         self.assertEqual(
             encode_frame(0x0404, 0x42, anc.payload_for("on")).hex(),
-            "aa0a00000404420300010108",
+            "aa0a00000404420300010104",
         )
         self.assertEqual(anc.payload_for("off"), b"\x01\x01\x01")
         self.assertEqual(anc.payload_for("transparency"), b"\x01\x01\x02")
@@ -164,31 +164,22 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(parse_set_anc_status(Frame(0x8404, 1, b"\x0e")), 14)
         self.assertIsNone(parse_set_anc_status(Frame(0x810C, 1, b"\x00")))
 
-    def test_buds_pro_anc_bitmap_parser(self):
-        anc = PROFILES["060C14"].anc
-        for value in (4, 8, 16):
-            self.assertEqual(parse_anc(Frame(0x810C, 1, bytes((0, 1, 1, value))), anc), "on")
+    def test_t310_anc_bitmap_parser(self):
+        anc = PROFILES["063C12"].anc
+        self.assertEqual(parse_anc(Frame(0x810C, 1, b"\x00\x01\x01\x04"), anc), "on")
         self.assertEqual(parse_anc(Frame(0x810C, 1, b"\x00\x01\x01\x02"), anc), "transparency")
         self.assertEqual(parse_anc(Frame(0x810C, 1, b"\x00\x01\x01\x01"), anc), "off")
 
-    def test_buds_pro_2_profile_and_observed_transparency(self):
-        profile = PROFILES["062014"]
+    def test_t310_profile_and_anc_modes(self):
+        profile = PROFILES["063C12"]
         anc = profile.anc
         self.assertTrue(profile.verified)
-        observed = Frame(0x810C, 0xF0, bytes.fromhex("00 01 01 00 01"))
-        self.assertEqual(parse_anc_state(observed, anc).mode, "transparency")
         self.assertEqual(anc.payload_for("off"), bytes.fromhex("01 01 01"))
-        self.assertEqual(anc.payload_for("on"), bytes.fromhex("01 01 02"))
-        self.assertEqual(anc.payload_for("transparency"), bytes.fromhex("01 01 04"))
-        self.assertEqual(anc.payload_for("deep"), bytes.fromhex("01 01 10"))
-        self.assertEqual(anc.payload_for("medium"), bytes.fromhex("01 01 20"))
-        self.assertEqual(anc.payload_for("light"), bytes.fromhex("01 01 40"))
-        self.assertEqual(anc.payload_for("smart"), bytes.fromhex("01 01 80"))
-        expected_levels = {4: "deep", 5: "medium", 6: "light", 7: "smart"}
-        for index, level in expected_levels.items():
-            bitmap = (1 << index).to_bytes(2, "little")
-            state = parse_anc_state(Frame(0x810C, 1, b"\x00\x01\x01" + bitmap), anc)
-            self.assertEqual((state.mode, state.level), ("on", level))
+        self.assertEqual(anc.payload_for("transparency"), bytes.fromhex("01 01 02"))
+        self.assertEqual(anc.payload_for("on"), bytes.fromhex("01 01 04"))
+        self.assertEqual(parse_anc_state(Frame(0x810C, 1, b"\x00\x01\x01\x01"), anc).mode, "off")
+        self.assertEqual(parse_anc_state(Frame(0x810C, 1, b"\x00\x01\x01\x02"), anc).mode, "transparency")
+        self.assertEqual(parse_anc_state(Frame(0x810C, 1, b"\x00\x01\x01\x04"), anc).mode, "on")
 
 
 if __name__ == "__main__":

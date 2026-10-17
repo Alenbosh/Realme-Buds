@@ -145,7 +145,7 @@ TestCase {
   tryCompare(widget, "useTwoColumnLayout", true)
  }
  function test_compatibility_notice_states_and_bounds() {
-  service.snapshot = ({status:{model:"OnePlus Buds Pro",product_id:"060C14",battery:{}},
+  service.snapshot = ({status:{model:"realme Buds T310",product_id:"063C12",battery:{}},
    compatibility:"verified", anc_modes:["off","on"], capabilities:[], session_connected:true})
   widget.popupOpen = true
   compare(widget.experimentalDevice, false)
@@ -154,7 +154,7 @@ TestCase {
   verify(widget.reportActionShown)
   compare(widget.reportActionLabel, "Report a problem")
 
-  service.snapshot = ({status:{model:"OnePlus Buds Pro 2",product_id:"062014",battery:{}},
+  service.snapshot = ({status:{model:"realme Buds Air 6",product_id:"063C13",battery:{}},
    compatibility:"verified", anc_modes:["off","on"], capabilities:[], session_connected:true})
   wait(0)
   compare(widget.experimentalDevice, false)
@@ -197,27 +197,27 @@ TestCase {
  }
 
  function test_report_filename_and_submission_outcomes() {
-  service.snapshot = ({status:{model:"OnePlus Buds Pro 2",product_id:"062014",battery:{}},
+  service.snapshot = ({status:{model:"realme Buds T310",product_id:"063C12",battery:{}},
    compatibility:"verified", anc_modes:[], capabilities:[], session_connected:true})
   widget.popupOpen = true
   widget.reportDetailsOpen = true
   widget.prepareReportFileDialog()
   verify(widget.proposedReportFilename.length > 0)
-  verify(/^oneplus-buds-pro-2-report-[0-9]{4}-[0-9]{2}-[0-9]{2}\.txt$/.test(
+  verify(/^realme-buds-t310-report-[0-9]{4}-[0-9]{2}-[0-9]{2}\.txt$/.test(
    widget.proposedReportFilename))
   verify(widget.reportDialogSelectedFile.endsWith("/" + widget.proposedReportFilename))
 
-  widget.saveDiagnosticReport("file:///tmp/oneplus-buds-pro-2-report-2026-09-16.txt")
+  widget.saveDiagnosticReport("file:///tmp/realme-buds-t310-report-2026-09-16.txt")
   var successId = widget.pendingRequestId
   compare(service.reportRequests, 1)
-  compare(service.reportPath, "file:///tmp/oneplus-buds-pro-2-report-2026-09-16.txt")
+  compare(service.reportPath, "file:///tmp/realme-buds-t310-report-2026-09-16.txt")
   service.lastResponse = ({request_id:successId,ok:true,
-   result:{saved:true,filename:"oneplus-buds-pro-2-report-2026-09-16.txt"}})
+   result:{saved:true,filename:"realme-buds-t310-report-2026-09-16.txt"}})
   wait(0)
   verify(widget.reportSaved)
   verify(findChild(widget, "reportSavedGuidance").visible)
-  compare(widget.savedReportFilename, "oneplus-buds-pro-2-report-2026-09-16.txt")
-  compare(widget.savedReportLocation, "/tmp/oneplus-buds-pro-2-report-2026-09-16.txt")
+  compare(widget.savedReportFilename, "realme-buds-t310-report-2026-09-16.txt")
+  compare(widget.savedReportLocation, "/tmp/realme-buds-t310-report-2026-09-16.txt")
   verify(widget.reportIssueUrl.indexOf("template=compatibility.md") !== -1)
   verify(widget.reportIssueUrl.indexOf("report=") === -1)
 

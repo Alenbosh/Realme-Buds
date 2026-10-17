@@ -1,6 +1,7 @@
-"""OnePlus/OPPO earbud protocol proof of concept."""
+"""Native realme earbuds control for Linux & Omarchy."""
 
 __version__ = "0.1.0"
+
 
 from .api import BudsBackend
 from .bridge import BudsFrontendBridge, serialize_snapshot

@@ -8,12 +8,27 @@ from threading import Event
 from realme_buds.bridge import BudsFrontendBridge, serialize_snapshot
 from realme_buds.controller import BudsController
 from realme_buds.models import EventBatch, SafeEvent
+from realme_buds.profiles import AncProfile, DeviceProfile, REGISTRY
 from test_controller import STATUS, FakeSession
 
+PROFILE_B = DeviceProfile(
+    product_id="063C13",
+    name="realme Buds Air 6",
+    service_uuid="0000079a-d102-11e1-9b23-00025b00a5a5",
+    anc=AncProfile(
+        write_indices={"off": 0, "transparency": 1, "on": 2},
+        read_modes={0: "off", 1: "transparency", 2: "on"},
+        read_levels={},
+        sequences={"off": 64},
+    ),
+    eq=None,
+    capabilities=frozenset({"anc", "battery"}),
+    compatibility="verified",
+)
 B = replace(STATUS, device=replace(STATUS.device, address='11:22:33:44:55:66',
-            name='OnePlus Buds Pro'), product_id='060C14', model='OnePlus Buds Pro',
+            name='realme Buds Air 6'), product_id='063C13', model='realme Buds Air 6',
             firmware_version='541.541.510', battery={'right': {'percentage': 42}},
-            anc='on', anc_level='deep')
+            anc='on', anc_level=None)
 
 
 class SwitchingBackend:
@@ -61,6 +76,14 @@ class SwitchingBackend:
 
 
 class SwitchingTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        REGISTRY.register(PROFILE_B)
+
+    @classmethod
+    def tearDownClass(cls):
+        REGISTRY.profiles.pop(PROFILE_B.product_id, None)
+
     def test_runner_switches_both_directions_and_ui_replaces_state(self):
         for first, second in ((STATUS, B), (B, STATUS)):
             with self.subTest(first=first.model):
@@ -117,7 +140,8 @@ for (const event of JSON.parse(process.argv[1])) {
                     json.dumps(events), second.product_id], text=True)
                 ui = json.loads(result)
                 self.assertEqual(ui['status']['model'], second.model)
-                self.assertEqual('medium' in ui['anc_modes'], second.product_id == '062014')
+                self.assertIn('transparency', ui['anc_modes'])
+                self.assertEqual(ui['status']['product_id'], second.product_id)
 
     def test_immediate_replacement_and_repeated_empty_retries(self):
         backend = SwitchingBackend(STATUS, B)

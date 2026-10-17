@@ -64,7 +64,7 @@ class TransactionTests(unittest.TestCase):
 
 
 class SessionControlTests(unittest.TestCase):
-    def session(self, product='062014', state=b'\x00\x01\x01\x01', ack=b'\x00'):
+    def session(self, product='063C12', state=b'\x00\x01\x01\x01', ack=b'\x00'):
         session = OpoSession(DEVICE, PROFILES[product])
         session._connected = session._authenticated = True
         transport = MagicMock()
@@ -136,7 +136,7 @@ class SessionControlTests(unittest.TestCase):
 class ControllerReuseTests(unittest.TestCase):
     def controller(self):
         session = FakeSession()
-        session.set_anc = Mock(return_value=(ControlResult(DEVICE.name, '062014', 'off', None, 0, True), EventBatch((), 0)))
+        session.set_anc = Mock(return_value=(ControlResult(DEVICE.name, '063C12', 'off', None, 0, True), EventBatch((), 0)))
         backend = FakeBackend([session, FakeSession()])
         backend.set_anc = Mock()
         controller = BudsController(backend)

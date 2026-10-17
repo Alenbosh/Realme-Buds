@@ -45,10 +45,11 @@ class BlueZAvailability(Availability):
     @staticmethod
     def _eligible(properties):
         return (bool(properties.get('Connected'))
-                and 'oneplus' in str(
+                and 'realme' in str(
                     properties.get('Name') or properties.get('Alias') or '').lower()
                 and bool(OPO_UUIDS.intersection(
                     str(uuid).lower() for uuid in properties.get('UUIDs', ()))))
+
 
     def changed(self, interface, changes, invalidated, path=None):
         if interface != DEVICE_INTERFACE:

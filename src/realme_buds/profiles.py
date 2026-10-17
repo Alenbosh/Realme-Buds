@@ -50,27 +50,13 @@ class EqProfile:
                      if normalized in (preset.key, str(preset.eq_id), *preset.aliases)), None)
 
 
-PRO_EQ_PRESETS = (
-    EqPresetProfile(0, "balanced", "Balanced"),
-    EqPresetProfile(1, "deep-sea-bass", "Deep Sea Bass"),
-    EqPresetProfile(2, "pure-vocals", "Pure Vocals"),
-    EqPresetProfile(3, "bright-and-crisp", "Bright & Crisp"),
-)
-
-PRO_2_EQ_PRESETS = (
-    EqPresetProfile(0, "balanced", "Balanced"),
-    EqPresetProfile(1, "bass", "Bass", ("deep-sea-bass",)),
-    EqPresetProfile(2, "serenade", "Serenade", ("pure-vocals",)),
-    EqPresetProfile(3, "bold", "Bold", ("bright-and-crisp",)),
-    EqPresetProfile(7, "hans-zimmer-soundscape-tuning", "Hans Zimmer Soundscape Tuning"),
-)
-
 T310_EQ_PRESETS = (
     EqPresetProfile(0, "balanced", "Balanced"),
     EqPresetProfile(1, "bass", "Clear Bass", ("bass-boost", "deep-sea-bass")),
     EqPresetProfile(2, "vocals", "Clear Vocals", ("pure-vocals", "serenade")),
     EqPresetProfile(3, "bright", "Bright", ("bold", "bright-and-crisp")),
 )
+
 
 
 @dataclass(frozen=True)
@@ -240,48 +226,6 @@ if DEVICES_DIR.exists():
     REGISTRY.load_directory(DEVICES_DIR)
 
 # Fallback definitions to guarantee availability even without directory access
-if not REGISTRY.get("060C14"):
-    REGISTRY.register(
-        DeviceProfile(
-            product_id="060C14",
-            name="OnePlus Buds Pro",
-            service_uuid="00001107-d102-11e1-9b23-00025b00a5a5",
-            anc=AncProfile(
-                write_indices={"off": 0, "transparency": 1, "light": 2, "on": 3, "deep": 3, "smart": 4},
-                read_modes={0: "off", 1: "transparency", 2: "on", 3: "on", 4: "on"},
-                read_levels={2: "light", 3: "deep", 4: "smart"},
-                sequences={"off": 0x40},
-            ),
-            eq=EqProfile(PRO_EQ_PRESETS, supports_custom=False, write_verified=True, custom_write_verified=False),
-            capabilities=frozenset({
-                "battery", "case_battery", "firmware", "anc", "transparency", "anc_levels", "smart_anc", "eq",
-            }),
-            compatibility="verified",
-        )
-    )
-
-if not REGISTRY.get("062014"):
-    REGISTRY.register(
-        DeviceProfile(
-            product_id="062014",
-            name="OnePlus Buds Pro 2",
-            service_uuid="0000079a-d102-11e1-9b23-00025b00a5a5",
-            anc=AncProfile(
-                write_indices={
-                    "off": 0, "on": 1, "transparency": 2, "deep": 4, "medium": 5, "light": 6, "smart": 7,
-                },
-                read_modes={0: "off", 1: "on", 2: "transparency", 3: "off", 8: "transparency"},
-                read_levels={4: "deep", 5: "medium", 6: "light", 7: "smart"},
-                sequences={"off": 0x40},
-            ),
-            eq=EqProfile(PRO_2_EQ_PRESETS, supports_custom=True, write_verified=True, custom_write_verified=True),
-            capabilities=frozenset({
-                "battery", "case_battery", "firmware", "anc", "transparency", "anc_levels", "smart_anc", "eq", "custom_eq",
-            }),
-            compatibility="verified",
-        )
-    )
-
 if not REGISTRY.get("063C12"):
     REGISTRY.register(
         DeviceProfile(

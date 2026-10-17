@@ -16,7 +16,7 @@ OBJECTS = {
     "/org/bluez/hci0/dev_AA_BB_CC_DD_EE_02": {
         DEVICE_INTERFACE: {
             "Address": "AA:BB:CC:DD:EE:02",
-            "Name": "OnePlus Buds Pro 2",
+            "Name": "realme Buds T310",
             "Connected": True,
             "UUIDs": ["0000079A-D102-11E1-9B23-00025B00A5A5"],
             "Modalias": "bluetooth:v02B0p0000d001F",
@@ -27,7 +27,7 @@ OBJECTS = {
     "/org/bluez/hci0/dev_AA_BB_CC_DD_EE_03": {
         DEVICE_INTERFACE: {
             "Address": "AA:BB:CC:DD:EE:03",
-            "Alias": "OnePlus Buds Pro",
+            "Alias": "realme Buds Wireless",
             "Connected": False,
             "UUIDs": ["00001107-d102-11e1-9b23-00025b00a5a5"],
         }
@@ -46,32 +46,32 @@ class BluezTests(unittest.TestCase):
         )
         self.assertTrue(t310.looks_compatible)
 
-    def test_oppo_name_with_known_opo_service_is_recognised_experimental_candidate(self):
-        oppo = Device(
+    def test_realme_air_name_with_known_service_is_recognised_candidate(self):
+        air = Device(
             address="AA:BB:CC:DD:EE:05",
-            name="OPPO Enco Unknown",
+            name="realme Buds Air 6",
             connected=True,
             uuids=("0000079a-d102-11e1-9b23-00025b00a5a5",),
             battery=None,
         )
-        self.assertTrue(oppo.looks_compatible)
+        self.assertTrue(air.looks_compatible)
 
     def test_brand_name_without_known_service_is_not_recognised(self):
-        oppo = Device(
+        device = Device(
             address="AA:BB:CC:DD:EE:05",
-            name="OPPO audio device",
+            name="realme audio device",
             connected=True,
             uuids=("0000110b-0000-1000-8000-00805f9b34fb",),
             battery=None,
         )
-        self.assertFalse(oppo.looks_compatible)
+        self.assertFalse(device.looks_compatible)
 
     @patch("realme_buds.bluez._managed_objects", return_value=OBJECTS)
     def test_connected_devices_uses_object_manager_snapshot(self, managed_objects):
         devices = connected_devices()
         self.assertEqual(len(devices), 2)
         buds = devices[1]
-        self.assertEqual(buds.name, "OnePlus Buds Pro 2")
+        self.assertEqual(buds.name, "realme Buds T310")
         self.assertEqual(buds.battery, 80)
         self.assertEqual(buds.modalias, "bluetooth:v02B0p0000d001F")
         self.assertTrue(buds.services_resolved)
@@ -80,7 +80,7 @@ class BluezTests(unittest.TestCase):
 
     @patch("realme_buds.bluez._managed_objects", return_value=OBJECTS)
     def test_explicit_selection_is_case_insensitive(self, _managed_objects):
-        self.assertEqual(select_device("aa:bb:cc:dd:ee:02").name, "OnePlus Buds Pro 2")
+        self.assertEqual(select_device("aa:bb:cc:dd:ee:02").name, "realme Buds T310")
 
     @patch("realme_buds.bluez._managed_objects")
     def test_ambiguous_automatic_selection_fails(self, managed_objects):
@@ -88,7 +88,7 @@ class BluezTests(unittest.TestCase):
         second["/org/bluez/hci0/dev_AA_BB_CC_DD_EE_04"] = {
             DEVICE_INTERFACE: {
                 "Address": "AA:BB:CC:DD:EE:04",
-                "Name": "OnePlus Buds Pro",
+                "Name": "realme Buds Air",
                 "Connected": True,
                 "UUIDs": ["00001107-d102-11e1-9b23-00025b00a5a5"],
             }

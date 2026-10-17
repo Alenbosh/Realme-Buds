@@ -8,15 +8,15 @@ from realme_buds.session import UnsupportedProductError
 
 DEVICE = Device(
     address="AA:BB:CC:DD:EE:FF",
-    name="OnePlus Buds Pro 2",
+    name="realme Buds T310",
     connected=True,
     uuids=("0000079a-d102-11e1-9b23-00025b00a5a5",),
     battery=80,
 )
 STATUS = StatusResult(
     device=DEVICE,
-    product_id="062014",
-    model="OnePlus Buds Pro 2",
+    product_id="063C12",
+    model="realme Buds T310",
     remote_version=(),
     firmware_version="196.196.101",
     battery={"left": {"percentage": 80, "charging": False}},
@@ -139,7 +139,7 @@ class FakeBackend:
     def set_anc(self, mode, _address=None):
         return ControlResult(
             name=DEVICE.name,
-            product_id="062014",
+            product_id="063C12",
             anc=mode,
             anc_level=None,
             set_status=0,

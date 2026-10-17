@@ -1,25 +1,18 @@
 {
   "format": "sanitized representative OPO frames; no Bluetooth addresses or pairing data",
-  "buds_pro": {
-    "product_id": "060C14",
+  "buds_t310": {
+    "product_id": "063C12",
     "tx_hello": "aa070000000123000012",
     "tx_register": "aa0c0000008541050000b550a069",
     "rx_capabilities": "aa0d0000008101050000bf17682604",
-    "rx_product": "aa0b0000038102040000140c06",
+    "rx_product": "aa0b0000038102040000123c06",
     "rx_version": "aa4400000581023d000008312c312c31312c312c322c3534312c312c332c3534312c322c312c31312c322c322c3534312c322c332c3534312c332c312c342c332c322c353130",
     "rx_battery": "aa0f00000681030800000302e401e40350",
     "rx_anc_off": "aa0b00000c8104040000010101",
-    "rx_set_success": "aa080000048442010000"
-  },
-  "buds_pro_2": {
-    "product_id": "062014",
-    "tx_hello": "aa070000000123000012",
-    "tx_register": "aa0c0000008541050000b550a069",
-    "rx_product": "aa0b0000038101040000142006",
-    "rx_version": "aa47000005810140000009312c312c30312c312c322c3139362c322c312c30312c322c322c3139362c332c312c30342c332c322c3130312c312c342c302c322c342c302c332c342c30",
+    "rx_anc_transparency": "aa0b00000c8104040000010102",
+    "rx_anc_on": "aa0b00000c8104040000010104",
+    "rx_set_success": "aa080000048442010000",
     "rx_notification_capabilities": "aa1300000082020c00000a01020304080bf1f2f30a",
-    "rx_feature_switches": "aa1500000d81000e000006050104010b01110018000600",
-    "rx_anc_transparency": "aa0c00000c81f005000001010001",
-    "rx_set_success": "aa080000048442010000"
+    "rx_feature_switches": "aa1500000d81000e000006050104010b01110018000600"
   }
 }

@@ -25,41 +25,36 @@ Discovery uses the system `dbus-python` binding already supplied by Omarchy/Arch
 
 ## Commands
 
-Run from the repository root during development. The executable `./oneplus-buds`
-now provides the same interface without setting PYTHONPATH. Disable the Omarchy
+Run from the repository root during development. The executable `./realme-buds`
+provides the same interface without setting PYTHONPATH. Disable the Omarchy
 plugin before running queries or writes so it does not compete for RFCOMM; re-enable
 it afterward. See the root README for dependency and installation instructions.
 
 Equivalent module invocations:
 
 ```bash
-PYTHONPATH=src python -m oneplus_buds.cli devices
-PYTHONPATH=src python -m oneplus_buds.cli status
-PYTHONPATH=src python -m oneplus_buds.cli capabilities
-PYTHONPATH=src python -m oneplus_buds.cli anc status
-PYTHONPATH=src python -m oneplus_buds.cli anc off
-PYTHONPATH=src python -m oneplus_buds.cli anc transparency
-PYTHONPATH=src python -m oneplus_buds.cli anc on
-PYTHONPATH=src python -m oneplus_buds.cli eq status
-PYTHONPATH=src python -m oneplus_buds.cli eq list
-PYTHONPATH=src python -m oneplus_buds.cli eq set bass
-PYTHONPATH=src python -m oneplus_buds.cli eq set custom:4
-PYTHONPATH=src python -m oneplus_buds.cli eq custom 5 0 0 0 0 0 0
-PYTHONPATH=src python -m oneplus_buds.cli diagnostics --report
+PYTHONPATH=src python3 -m realme_buds.cli devices
+PYTHONPATH=src python3 -m realme_buds.cli status
+PYTHONPATH=src python3 -m realme_buds.cli capabilities
+PYTHONPATH=src python3 -m realme_buds.cli anc status
+PYTHONPATH=src python3 -m realme_buds.cli anc off
+PYTHONPATH=src python3 -m realme_buds.cli anc transparency
+PYTHONPATH=src python3 -m realme_buds.cli anc on
+PYTHONPATH=src python3 -m realme_buds.cli eq status
+PYTHONPATH=src python3 -m realme_buds.cli eq list
+PYTHONPATH=src python3 -m realme_buds.cli eq set bass
+PYTHONPATH=src python3 -m realme_buds.cli diagnostics --report
 ```
 
-EQ is earbud-native OPO control, not PipeWire/software processing. `eq status`
-returns fresh current state, factory presets and any device-declared custom
-definitions. `eq set` accepts listed keys, numeric factory IDs, or `custom:<id>`.
-`eq custom` updates only an existing device-returned entry and requires exactly
-one whole-dB value per returned band, within its returned limits. Every write
-pre-reads state, sends once, and verifies with fresh queries. Unknown devices and
-unverified feature/model combinations cannot write.
+EQ is earbud-native control, not PipeWire/software processing. `eq status`
+returns fresh current state and factory presets. `eq set` accepts listed keys
+or numeric factory IDs. Every write pre-reads state, sends once, and verifies
+with fresh queries. Unknown devices and unverified feature/model combinations cannot write.
 
 Select among multiple connected compatible devices by putting the global option before the command:
 
 ```bash
-PYTHONPATH=src python -m oneplus_buds.cli --device AA:BB:CC:DD:EE:FF status
+PYTHONPATH=src python3 -m realme_buds.cli --device AA:BB:CC:DD:EE:FF status
 ```
 
 `devices` prints addresses for connected compatible devices because they are needed for explicit selection. `diagnostics --report` deliberately omits Bluetooth addresses, device aliases, user/host identity, home paths, credentials, unrelated devices and raw frames. The panel uses the same dedicated report layer and adds safe cached connection/protocol counters without issuing a hardware command.

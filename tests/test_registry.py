@@ -21,8 +21,6 @@ from realme_buds.profiles import (
 
 class DeviceRegistryTests(unittest.TestCase):
     def test_builtin_profiles_loaded(self):
-        self.assertIn("060C14", REGISTRY.profiles)
-        self.assertIn("062014", REGISTRY.profiles)
         self.assertIn("063C12", REGISTRY.profiles)
 
         t310 = REGISTRY.get("063C12")
@@ -43,9 +41,7 @@ class DeviceRegistryTests(unittest.TestCase):
     def test_registry_all_and_supported_product_ids(self):
         all_profiles = REGISTRY.all()
         ids = REGISTRY.supported_product_ids()
-        self.assertGreaterEqual(len(all_profiles), 3)
-        self.assertIn("060C14", ids)
-        self.assertIn("062014", ids)
+        self.assertGreaterEqual(len(all_profiles), 1)
         self.assertIn("063C12", ids)
 
     def test_device_profile_from_dict_and_to_dict_roundtrip(self):

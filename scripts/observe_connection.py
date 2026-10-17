@@ -24,15 +24,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True)
     args = parser.parse_args()
-    os.environ['ONEPLUS_BUDS_LIFECYCLE_TRACE'] = args.output
+    os.environ['REALME_BUDS_LIFECYCLE_TRACE'] = args.output
     DBusGMainLoop(set_as_default=True)
     bus = dbus.SystemBus(private=True)
     manager = dbus.Interface(bus.get_object('org.bluez', '/'),
                              'org.freedesktop.DBus.ObjectManager')
     properties = {}
     def compatible(props):
-        return 'oneplus' in str(props.get('Name', '')).lower() and bool(
+        return 'realme' in str(props.get('Name', '')).lower() and bool(
             OPO_UUIDS.intersection(str(x).lower() for x in props.get('UUIDs', [])))
+
     def changed(interface, changes, invalidated, path=None):
         if interface != DEVICE_INTERFACE:
             return

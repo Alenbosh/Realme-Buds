@@ -22,8 +22,8 @@ class DiagnosticReportTests(unittest.TestCase):
         )
         self.status = StatusResult(
             device=self.device,
-            product_id="062014",
-            model="OnePlus Buds Pro 2",
+            product_id="063C12",
+            model="realme Buds T310",
             remote_version=(),
             firmware_version="196.196.101",
             battery={"left": {"percentage": 72, "charging": False}},
