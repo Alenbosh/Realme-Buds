@@ -120,7 +120,12 @@ BarWidget {
     }
   }
 
+  readonly property bool opened: popupOpen
+
+  function open() { popupOpen = true }
   function close() { popupOpen = false }
+  function togglePanel() { popupOpen = !popupOpen }
+
 
   function selectAnc(mode) {
     if (!budsService || connection !== "connected" || pendingRequestId >= 0) return
