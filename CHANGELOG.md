@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.1.0 release candidate
 
+- Refresh battery state when the panel opens and poll it periodically on the
+  running authenticated session, without reopening Bluetooth.
+- Ignore a disconnected-case zero reading so the bar and tooltip do not show a
+  phantom empty charging case.
 - Distinguish Verified, Community Tested and Experimental device evidence in the
   backend and panel; only Buds Pro and Buds Pro 2 remain hardware-verified.
 - Add a compact experimental-device notice and user-controlled compatibility

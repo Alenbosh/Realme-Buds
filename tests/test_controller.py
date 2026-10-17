@@ -86,6 +86,18 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(polled.status.product_id, "A1B2C3")
         self.assertEqual(backend.starts, 1)
 
+    def test_refresh_battery_updates_status_and_preserves_case(self):
+        from dataclasses import replace
+        session = FakeSession()
+        backend = FakeBackend([session])
+        controller = BudsController(backend)
+        controller.start()
+        controller._status = replace(controller._status, battery={"case": {"percentage": 80, "charging": False}})
+        battery = controller.refresh_battery()
+        self.assertEqual(battery["left"]["percentage"], 75)
+        self.assertEqual(controller._status.battery["case"]["percentage"], 80)
+        self.assertEqual(controller._status.battery["left"]["percentage"], 75)
+
 
 class FakeBackend:
     def __init__(self, sessions):
@@ -146,6 +158,9 @@ class FakeSession:
 
     def authenticate_and_subscribe(self):
         return self.initial
+
+    def query_battery(self):
+        return {"left": {"percentage": 75, "charging": False}, "right": {"percentage": 75, "charging": False}}
 
     def poll(self, _wait):
         item = self.polls.pop(0) if self.polls else EventBatch((), 0)

@@ -83,6 +83,14 @@ class ProtocolTests(unittest.TestCase):
                 "case": {"percentage": 80, "charging": False},
             },
         )
+        t310_disconnected_case = decode_frame(bytes.fromhex("aa0f000006810008000003025a015a0300"))
+        self.assertEqual(
+            parse_battery(t310_disconnected_case),
+            {
+                "right": {"percentage": 90, "charging": False},
+                "left": {"percentage": 90, "charging": False},
+            },
+        )
         subscribed = bytes.fromhex(
             "aa170000058204100000070100020003000400060008000a00"
             "aa0f00000402010b000203010402040304"

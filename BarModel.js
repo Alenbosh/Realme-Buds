@@ -18,6 +18,7 @@ function batteryParts(snapshot) {
     var name = names[i]
     var value = battery[name.key]
     if (!value || !validPercentage(value.percentage)) continue
+    if (name.key === "case" && value.percentage === 0 && !value.charging) continue
     parts.push({
       key: name.key,
       short: name.short,

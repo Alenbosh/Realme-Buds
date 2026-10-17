@@ -135,6 +135,15 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(controller.refreshes, 1)
         self.assertEqual(emitted[-1]["type"], "snapshot")
 
+    def test_refresh_battery_command_updates_state(self):
+        emitted = []
+        controller = FakeController()
+        bridge = BudsFrontendBridge(emitted.append, controller=controller)
+        response = bridge.execute("refresh_battery")
+        self.assertTrue(response["ok"])
+        self.assertEqual(response["result"]["battery"]["left"]["percentage"], 85)
+        self.assertEqual(emitted[-1]["type"], "snapshot")
+
     def test_set_anc_returns_verified_result_and_emits_snapshot(self):
         emitted = []
         controller = FakeController()
@@ -232,6 +241,9 @@ class FakeController:
         if self.error:
             raise self.error
         return SNAPSHOT
+
+    def refresh_battery(self):
+        return {"left": {"percentage": 85, "charging": False}}
 
     def set_anc(self, mode):
         self.anc_modes.append(mode)

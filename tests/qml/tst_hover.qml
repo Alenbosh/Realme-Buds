@@ -14,7 +14,9 @@ TestCase {
   property var customRequest: null
   property int reportRequests: 0
   property string reportPath: ""
+  property int batteryRefreshes: 0
   function eqStatus() { eqStatusCalls++; return nextId++ }
+  function refreshBattery() { batteryRefreshes++; return nextId++ }
   function setEq(value) { return nextId++ }
   function setCustomEq(entryId, gains) {
    customRequest = ({entry_id: entryId, gains: gains}); return nextId++
@@ -45,6 +47,7 @@ TestCase {
   service.customRequest = null
   service.reportRequests = 0
   service.reportPath = ""
+  service.batteryRefreshes = 0
   host.panelAvailableWidth = 600
   widget.popupOpen = false
   widget.pendingRequestId = -1
@@ -65,6 +68,7 @@ TestCase {
   verify(widget.batteryExpanded)
   mouseClick(widget, expanded - 3, 13)
   verify(widget.popupOpen)
+  verify(service.batteryRefreshes >= 1)
   mouseMove(widget, -100, 50)
   wait(550)
   compare(widget.width, expanded)

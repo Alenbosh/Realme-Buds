@@ -103,6 +103,12 @@ class BudsFrontendBridge:
                 snapshot = self.controller.refresh()
                 result = serialize_snapshot(snapshot)
                 self._on_snapshot(snapshot)
+            elif command == "refresh_battery":
+                self._require_parameters(command, params, set())
+                battery = self.controller.refresh_battery()
+                snapshot = self.controller.snapshot()
+                result = {"battery": battery}
+                self._on_snapshot(snapshot)
             elif command == "set_anc":
                 self._require_parameters(command, params, {"mode"})
                 mode = params["mode"]

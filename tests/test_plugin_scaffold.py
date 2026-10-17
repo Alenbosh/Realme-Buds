@@ -108,6 +108,14 @@ const shown = model.presentation("connected", snapshot);
 if (shown.label !== "L 83%  R 42%⚡") process.exit(1);
 if (!shown.tooltip.includes("OnePlus Buds Pro 2") || !shown.tooltip.includes("Right: 42% (charging)")) process.exit(2);
 if (shown.tooltip.includes("Case:") || shown.label.includes("99")) process.exit(3);
+const zeroCaseSnapshot = {status: {model: "realme Buds T310", battery: {
+  left: {percentage: 90, charging: false},
+  right: {percentage: 90, charging: false},
+  case: {percentage: 0, charging: false}
+}}};
+const zeroCaseShown = model.presentation("connected", zeroCaseSnapshot);
+if (zeroCaseShown.label !== "L 90%  R 90%") process.exit(31);
+if (zeroCaseShown.tooltip.includes("Case:")) process.exit(32);
 const disconnected = model.presentation("reconnecting", snapshot);
 if (disconnected.connected || disconnected.label !== "" || !disconnected.tooltip.includes("Reconnecting")) process.exit(4);
 if (model.validPercentage(-1) || model.validPercentage(101) || model.validPercentage("80")) process.exit(5);

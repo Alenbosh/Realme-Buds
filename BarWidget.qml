@@ -103,6 +103,9 @@ BarWidget {
       syncCustomSlotFromEq()
       collapseTimer.stop()
       if (bar) bar.hideTooltip(root)
+      if (budsService && connection === "connected") {
+        budsService.refreshBattery()
+      }
       if (budsService && connection === "connected" && snapshot
           && snapshot.capabilities && snapshot.capabilities.indexOf("eq") !== -1
           && pendingRequestId < 0) {

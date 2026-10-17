@@ -218,6 +218,8 @@ def parse_battery(frame: Frame) -> dict[str, dict[str, int | bool]] | None:
     for offset in range(0, len(payload) - 1, 2):
         component, raw = payload[offset : offset + 2]
         if component in names:
+            if component == 3 and raw == 0:
+                continue
             result[names[component]] = {
                 "percentage": raw & 0x7F,
                 "charging": bool(raw & 0x80),

@@ -48,6 +48,10 @@ Bluetooth addresses, raw OPO frames, pairing data, and raw notification payloads
 
 - `snapshot` with no parameters: returns the cached state without Bluetooth I/O.
 - `refresh` with no parameters: performs a serialized one-shot refresh and emits the resulting snapshot.
+- `refresh_battery` with no parameters: queries battery state on the running
+  authenticated session only, preserves the cached case reading when the device
+  omits it, and emits the resulting snapshot. It never opens a second session or
+  writes device state.
 - `set_anc` with exactly `{"mode": "..."}`: uses the existing authenticated, profile-gated, query-after-write verified controller path and emits the resulting snapshot.
 - `eq_status` with no parameters: freshly reads native EQ state and device-declared
   custom capabilities on the existing authenticated session.

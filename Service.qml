@@ -75,6 +75,10 @@ Item {
     return request("refresh", {})
   }
 
+  function refreshBattery() {
+    return request("refresh_battery", {})
+  }
+
   function setAnc(mode) {
     return request("set_anc", { mode: String(mode || "") })
   }

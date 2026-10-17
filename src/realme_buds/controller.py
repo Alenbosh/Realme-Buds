@@ -72,6 +72,27 @@ class BudsController:
             self.shutdown()
             return self.start()
 
+    def request_battery(self) -> None:
+        with self._lock:
+            if self._session is not None and hasattr(self._session, "request_battery"):
+                self._session.request_battery()
+
+    def refresh_battery(self) -> dict[str, dict[str, int | bool]] | None:
+        with self._lock:
+            self._require_running()
+            if self._session is None:
+                return None
+            battery = self._session.query_battery() if hasattr(self._session, "query_battery") else None
+            if battery is not None and self._status is not None:
+                new_battery = dict(battery)
+                if self._status.battery and "case" in self._status.battery and "case" not in new_battery:
+                    prev_case = self._status.battery["case"]
+                    if isinstance(prev_case, dict) and prev_case.get("percentage", 0) > 0:
+                        new_battery["case"] = {"percentage": prev_case["percentage"], "charging": False}
+                self._status = replace(self._status, battery=new_battery)
+                self._generation += 1
+            return battery
+
     def set_anc(self, mode: str) -> ControlResult:
         timer = PhaseTimer()
         timings: dict[str, float] = {}
@@ -274,9 +295,14 @@ class BudsController:
         self._ignored_frames += batch.ignored_frames
         for event in batch.events:
             if event.kind == "battery" and self._status is not None:
+                new_battery = dict(cast(dict[str, dict[str, int | bool]], event.data))
+                if self._status.battery and "case" in self._status.battery and "case" not in new_battery:
+                    prev_case = self._status.battery["case"]
+                    if isinstance(prev_case, dict) and prev_case.get("percentage", 0) > 0:
+                        new_battery["case"] = {"percentage": prev_case["percentage"], "charging": False}
                 self._status = replace(
                     self._status,
-                    battery=cast(dict[str, dict[str, int | bool]], event.data),
+                    battery=new_battery,
                 )
             elif event.kind == "anc" and self._status is not None:
                 self._status = replace(

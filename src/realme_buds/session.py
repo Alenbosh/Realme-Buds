@@ -63,7 +63,8 @@ class UnsupportedProductError(RuntimeError):
 
 class OpoSession:
     def __init__(self, device: Device, profile: DeviceProfile,
-                 *, transport: RfcommTransport | None = None) -> None:
+                 *, transport: RfcommTransport | None = None,
+                 battery_poll_interval: float = 30.0) -> None:
         self.device = device
         self.profile = profile
         self._transport = transport or RfcommTransport(device.address, channel=profile.channel, connect_attempts=4)
@@ -73,6 +74,21 @@ class OpoSession:
         self._connected = False
         self._authenticated = False
         self.advertised_event_codes: tuple[int, ...] = ()
+        self.battery_poll_interval = battery_poll_interval
+        self._last_battery_poll = monotonic()
+        self._battery_pending = False
+
+    def request_battery(self) -> None:
+        self._battery_pending = True
+
+    def query_battery(self) -> dict[str, dict[str, int | bool]] | None:
+        self._require_connected()
+        received: list[Frame] = []
+        frame = self._transport.request(
+            QUERY_BATTERY, b"", RESPONSE_BATTERY, on_frames=received.extend
+        )
+        self._last_battery_poll = monotonic()
+        return parse_battery(frame)
 
     @classmethod
     def bootstrap(cls, device: Device) -> tuple["OpoSession", StatusResult, EventBatch]:
@@ -428,6 +444,12 @@ class OpoSession:
             self._version_pending = False
             self._version_sequence = self._transport.send_query(QUERY_REMOTE_VERSION)
             mark("optional_firmware_sent")
+        now = monotonic()
+        if self._battery_pending or (now - self._last_battery_poll >= self.battery_poll_interval):
+            self._battery_pending = False
+            self._last_battery_poll = now
+            if hasattr(self._transport, "send_query"):
+                self._transport.send_query(QUERY_BATTERY)
         received = self._redact(self._transport.receive(wait))
         return EventBatch(
             setup.events + received.events,

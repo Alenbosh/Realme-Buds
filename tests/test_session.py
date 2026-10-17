@@ -47,6 +47,26 @@ class SessionTests(unittest.TestCase):
         self.assertEqual(batch.ignored_frames, 1)
         self.assertNotIn("secret", repr(batch))
 
+    def test_poll_queries_battery_periodically_and_on_demand(self):
+        transport = FakeTransport({})
+        with patch("realme_buds.session.RfcommTransport", return_value=transport):
+            with OpoSession(DEVICE, PROFILES["062014"], battery_poll_interval=10.0) as session:
+                # Initially not due
+                session.poll()
+                self.assertNotIn((0x0106, b""), transport.sent_queries)
+                # On demand request
+                session.request_battery()
+                session.poll()
+                self.assertIn((0x0106, b""), transport.sent_queries)
+
+    def test_query_battery_returns_parsed_result(self):
+        transport = FakeTransport({0x0106: [Frame(0x8106, 1, b"\x01\x50\x02\x50")]})
+        with patch("realme_buds.session.RfcommTransport", return_value=transport):
+            with OpoSession(DEVICE, PROFILES["062014"]) as session:
+                result = session.query_battery()
+                self.assertEqual(result["left"]["percentage"], 80)
+                self.assertEqual(result["right"]["percentage"], 80)
+
     def test_session_must_be_connected(self):
         session = OpoSession(DEVICE, PROFILES["062014"])
         with self.assertRaisesRegex(RuntimeError, "not connected"):
@@ -58,6 +78,7 @@ class FakeTransport:
         self.responses = responses
         self.received = received or []
         self.queries = []
+        self.sent_queries = []
 
     def __enter__(self):
         return self
@@ -69,6 +90,15 @@ class FakeTransport:
         payload = args[0] if args else b""
         self.queries.append((command, payload))
         return self.responses.get(command, [])
+
+    def send_query(self, command, payload=b""):
+        self.sent_queries.append((command, payload))
+        return 1
+
+    def request(self, command, payload, response_command, on_frames=None, **kwargs):
+        self.queries.append((command, payload))
+        frames = self.responses.get(command, [])
+        return frames[0] if frames else Frame(response_command, 1, b"")
 
     def exchange_raw(self, *_args, **_kwargs):
         return []
