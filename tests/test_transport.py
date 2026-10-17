@@ -1,10 +1,39 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from realme_buds.transport import RfcommTransport
+from realme_buds.transport import DEFAULT_CHANNELS, RfcommTransport, Transport, create_transport
 
 
 class TransportTests(unittest.TestCase):
+    def test_rfcomm_transport_implements_transport_protocol(self):
+        transport = RfcommTransport("AA:BB:CC:DD:EE:FF")
+        self.assertIsInstance(transport, Transport)
+        self.assertFalse(transport.is_connected)
+
+    @patch("realme_buds.transport.socket.socket")
+    def test_is_connected_reflects_socket_lifecycle(self, socket_factory):
+        sock = Mock()
+        socket_factory.return_value = sock
+        transport = RfcommTransport("AA:BB:CC:DD:EE:FF")
+        self.assertFalse(transport.is_connected)
+        with transport:
+            self.assertTrue(transport.is_connected)
+        self.assertFalse(transport.is_connected)
+
+    def test_create_transport_factory(self):
+        t1 = create_transport("AA:BB:CC:DD:EE:FF")
+        self.assertIsInstance(t1, RfcommTransport)
+        self.assertEqual(t1.address, "AA:BB:CC:DD:EE:FF")
+        self.assertEqual(t1.candidate_channels, DEFAULT_CHANNELS)
+
+        t2 = create_transport("AA:BB:CC:DD:EE:FF", channel=1, timeout=5.0)
+        self.assertIsInstance(t2, RfcommTransport)
+        self.assertEqual(t2.candidate_channels, (1,))
+        self.assertEqual(t2.timeout, 5.0)
+
+        with self.assertRaises(ValueError):
+            create_transport("AA:BB:CC:DD:EE:FF", transport_type="unsupported")
+
     @patch("realme_buds.transport.time.sleep")
     @patch("realme_buds.transport.socket.socket")
     def test_retries_transient_busy(self, socket_factory, sleep):

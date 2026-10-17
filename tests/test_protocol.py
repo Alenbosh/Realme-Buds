@@ -1,7 +1,33 @@
 import unittest
 
 from realme_buds.profiles import PROFILES
-from realme_buds.protocol import HELLO, REGISTER, STATUS_QUERY_PAYLOAD, Frame, FrameStream, VersionRecord, decode_frame, encode_frame, format_firmware_version, parse_anc, parse_anc_state, parse_battery, parse_broadcast_codes, parse_feature_switches, parse_product_id, parse_remote_version, parse_set_anc_status
+from realme_buds.protocol import (
+    FEATURE_GAME_MODE,
+    FEATURE_SWITCH_IDS,
+    FEATURE_SWITCH_NAMES,
+    FEATURE_WEAR_DETECTION,
+    HELLO,
+    REGISTER,
+    RESPONSE_SET_FEATURE,
+    STATUS_QUERY_PAYLOAD,
+    Frame,
+    FrameStream,
+    VersionRecord,
+    decode_frame,
+    encode_frame,
+    encode_set_feature_payload,
+    format_firmware_version,
+    parse_anc,
+    parse_anc_state,
+    parse_battery,
+    parse_broadcast_codes,
+    parse_feature_switches,
+    parse_product_id,
+    parse_remote_version,
+    parse_set_anc_status,
+    parse_set_feature_status,
+)
+
 
 
 class ProtocolTests(unittest.TestCase):
@@ -70,6 +96,26 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(parse_feature_switches(frame), {0x04: True, 0x11: False, 0x18: False})
         self.assertIsNone(parse_feature_switches(Frame(0x810D, 0, b"\x00\x02\x04\x01")))
         self.assertIsNone(parse_feature_switches(Frame(0x810D, 0, b"\x00\x01\x04\x02")))
+
+    def test_encode_and_parse_set_feature(self):
+        payload_on = encode_set_feature_payload(FEATURE_GAME_MODE, True)
+        self.assertEqual(payload_on, b"\x28\x01")
+        payload_off = encode_set_feature_payload(FEATURE_WEAR_DETECTION, False)
+        self.assertEqual(payload_off, b"\x04\x00")
+
+        with self.assertRaises(ValueError):
+            encode_set_feature_payload(-1, True)
+        with self.assertRaises(ValueError):
+            encode_set_feature_payload(256, True)
+
+        self.assertEqual(parse_set_feature_status(Frame(RESPONSE_SET_FEATURE, 1, b"\x00")), 0)
+        self.assertEqual(parse_set_feature_status(Frame(RESPONSE_SET_FEATURE, 1, b"\x01")), 1)
+        self.assertIsNone(parse_set_feature_status(Frame(RESPONSE_SET_FEATURE, 1, b"")))
+        self.assertIsNone(parse_set_feature_status(Frame(0x8404, 1, b"\x00")))
+
+        self.assertEqual(FEATURE_SWITCH_IDS["game_mode"], FEATURE_GAME_MODE)
+        self.assertEqual(FEATURE_SWITCH_IDS["wear_detection"], FEATURE_WEAR_DETECTION)
+
 
     def test_observed_buds_pro_responses(self):
         capability = bytes.fromhex("aa0d0000008101050000bf17682604")

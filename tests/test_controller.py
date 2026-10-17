@@ -98,6 +98,21 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(controller._status.battery["case"]["percentage"], 80)
         self.assertEqual(controller._status.battery["left"]["percentage"], 75)
 
+    def test_query_and_set_feature_switch(self):
+        session = FakeSession()
+        backend = FakeBackend([session])
+        controller = BudsController(backend)
+        controller.start()
+
+        switches = controller.query_feature_switches()
+        self.assertEqual(switches, {"game_mode": False})
+        self.assertEqual(controller.snapshot().feature_switches, {"game_mode": False})
+
+        ok = controller.set_feature_switch("game_mode", True)
+        self.assertTrue(ok)
+        self.assertEqual(controller.snapshot().feature_switches["game_mode"], True)
+        controller.shutdown()
+
 
 class FakeBackend:
     def __init__(self, sessions):
@@ -162,11 +177,18 @@ class FakeSession:
     def query_battery(self):
         return {"left": {"percentage": 75, "charging": False}, "right": {"percentage": 75, "charging": False}}
 
+    def query_feature_switches(self):
+        return {"game_mode": False}
+
+    def set_feature_switch(self, feature, enabled):
+        return True, EventBatch((SafeEvent("feature_switches", {str(feature): enabled}),), 0)
+
     def poll(self, _wait):
         item = self.polls.pop(0) if self.polls else EventBatch((), 0)
         if isinstance(item, Exception):
             raise item
         return item
+
 
 
 if __name__ == "__main__":

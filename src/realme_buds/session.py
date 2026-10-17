@@ -24,6 +24,7 @@ from .protocol import (
     QUERY_ANC,
     QUERY_EQ,
     QUERY_EQ_ALL,
+    QUERY_STATUS,
     SET_ANC,
     SET_EQ,
     SET_EQ_DETAIL,
@@ -36,12 +37,17 @@ from .protocol import (
     RESPONSE_SET_EQ_DETAIL,
     RESPONSE_BATTERY,
     RESPONSE_STATUS,
+    SET_FEATURE,
+    RESPONSE_SET_FEATURE,
+    STATUS_QUERY_PAYLOAD,
     SUBSCRIBE_BROADCAST,
     Frame,
     FEATURE_SWITCH_NAMES,
+    FEATURE_SWITCH_IDS,
     EQ_ALL_QUERY_PAYLOAD,
     EqEntry,
     encode_eq_detail_payload,
+    encode_set_feature_payload,
     parse_anc_state,
     parse_battery,
     parse_broadcast_codes,
@@ -50,8 +56,9 @@ from .protocol import (
     parse_feature_switches,
     parse_set_anc_status,
     parse_set_eq_status,
+    parse_set_feature_status,
 )
-from .transport import RfcommTransport
+from .transport import RfcommTransport, Transport
 
 
 class UnsupportedProductError(RuntimeError):
@@ -63,7 +70,7 @@ class UnsupportedProductError(RuntimeError):
 
 class OpoSession:
     def __init__(self, device: Device, profile: DeviceProfile,
-                 *, transport: RfcommTransport | None = None,
+                 *, transport: Transport | None = None,
                  battery_poll_interval: float = 30.0) -> None:
         self.device = device
         self.profile = profile
@@ -89,6 +96,56 @@ class OpoSession:
         )
         self._last_battery_poll = monotonic()
         return parse_battery(frame)
+
+    def query_feature_switches(self) -> dict[str, bool]:
+        """Query feature switch states (game mode, wear detection, multipoint, etc.)."""
+        self._require_connected()
+        received: list[Frame] = []
+        frame = self._transport.request(
+            QUERY_STATUS,
+            STATUS_QUERY_PAYLOAD,
+            RESPONSE_STATUS,
+            sequence=0,
+            on_frames=received.extend,
+        )
+        switches = parse_feature_switches(frame) or {}
+        return {
+            name: switches[feature]
+            for feature, name in FEATURE_SWITCH_NAMES.items()
+            if feature in switches
+        }
+
+    def set_feature_switch(self, feature: int | str, enabled: bool) -> tuple[bool, EventBatch]:
+        """Set a boolean feature switch on the connected earbuds."""
+        self._require_connected()
+        if not self._authenticated:
+            raise RuntimeError("session authentication has not completed")
+        if isinstance(feature, str):
+            feature_id = FEATURE_SWITCH_IDS.get(feature)
+            if feature_id is None:
+                raise ValueError(f"Unknown feature switch: {feature!r}")
+        else:
+            feature_id = feature
+
+        payload = encode_set_feature_payload(feature_id, enabled)
+        received: list[Frame] = []
+        frame = self._transport.request(
+            SET_FEATURE,
+            payload,
+            RESPONSE_SET_FEATURE,
+            on_frames=received.extend,
+        )
+        status = parse_set_feature_status(frame)
+        success = status == 0
+        events: list[SafeEvent] = []
+        for recv_frame in received:
+            event = self._collect_frame(recv_frame)
+            if event is not None:
+                events.append(event)
+        name = FEATURE_SWITCH_NAMES.get(feature_id, f"0x{feature_id:02X}")
+        events.append(SafeEvent("feature_switches", {name: enabled}))
+        return success, EventBatch(tuple(events), 0)
+
 
     @classmethod
     def bootstrap(cls, device: Device) -> tuple["OpoSession", StatusResult, EventBatch]:

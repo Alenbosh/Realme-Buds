@@ -226,6 +226,26 @@ class BudsController:
             self._generation += 1
             return result
 
+    def query_feature_switches(self) -> dict[str, bool]:
+        with self._lock:
+            self._require_running()
+            if self._session is None:
+                return dict(self._feature_switches)
+            switches = cast(OpoSession, self._session).query_feature_switches()
+            self._feature_switches.update(switches)
+            self._generation += 1
+            return dict(self._feature_switches)
+
+    def set_feature_switch(self, feature: int | str, enabled: bool) -> bool:
+        with self._lock:
+            self._require_running()
+            if self._session is None:
+                raise RuntimeError("session is not connected")
+            success, batch = cast(OpoSession, self._session).set_feature_switch(feature, enabled)
+            self._apply_batch(batch)
+            return success
+
+
     def poll(self, wait: float = 0.2) -> ControllerSnapshot:
         with self._lock:
             self._require_running()

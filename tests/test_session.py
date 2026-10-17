@@ -72,6 +72,29 @@ class SessionTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "not connected"):
             session.poll()
 
+    def test_query_feature_switches(self):
+        transport = FakeTransport({
+            0x010D: [Frame(0x810D, 0, bytes.fromhex("00 02 04 01 28 01"))]
+        })
+        with patch("realme_buds.session.RfcommTransport", return_value=transport):
+            with OpoSession(DEVICE, PROFILES["062014"]) as session:
+                switches = session.query_feature_switches()
+                self.assertEqual(switches, {"wear_detection": True, "game_mode": True})
+
+    def test_set_feature_switch(self):
+        transport = FakeTransport({
+            0x0403: [Frame(0x8403, 1, b"\x00")]
+        })
+        with patch("realme_buds.session.RfcommTransport", return_value=transport):
+            with OpoSession(DEVICE, PROFILES["062014"]) as session:
+                session._authenticated = True
+                success, batch = session.set_feature_switch("game_mode", True)
+                self.assertTrue(success)
+                self.assertEqual(batch.events[-1].kind, "feature_switches")
+                self.assertEqual(batch.events[-1].data, {"game_mode": True})
+                self.assertIn((0x0403, b"\x28\x01"), transport.queries)
+
+
 
 class FakeTransport:
     def __init__(self, responses, received=None):

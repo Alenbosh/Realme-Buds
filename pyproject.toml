@@ -21,3 +21,7 @@ realme-buds = "realme_buds.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+realme_buds = ["devices/*.json"]
+

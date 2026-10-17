@@ -1,0 +1,81 @@
+{
+  "product_id": "062014",
+  "name": "OnePlus Buds Pro 2",
+  "service_uuid": "0000079a-d102-11e1-9b23-00025b00a5a5",
+  "channel": 15,
+  "transport_type": "rfcomm",
+  "compatibility": "verified",
+  "capabilities": [
+    "battery",
+    "case_battery",
+    "firmware",
+    "anc",
+    "transparency",
+    "anc_levels",
+    "smart_anc",
+    "eq",
+    "custom_eq"
+  ],
+  "anc": {
+    "write_indices": {
+      "off": 0,
+      "on": 1,
+      "transparency": 2,
+      "deep": 4,
+      "medium": 5,
+      "light": 6,
+      "smart": 7
+    },
+    "read_modes": {
+      "0": "off",
+      "1": "on",
+      "2": "transparency",
+      "3": "off",
+      "8": "transparency"
+    },
+    "read_levels": {
+      "4": "deep",
+      "5": "medium",
+      "6": "light",
+      "7": "smart"
+    },
+    "sequences": {
+      "off": 64
+    }
+  },
+  "eq": {
+    "supports_custom": true,
+    "write_verified": true,
+    "custom_write_verified": true,
+    "presets": [
+      {
+        "id": 0,
+        "key": "balanced",
+        "name": "Balanced"
+      },
+      {
+        "id": 1,
+        "key": "bass",
+        "name": "Bass",
+        "aliases": ["deep-sea-bass"]
+      },
+      {
+        "id": 2,
+        "key": "serenade",
+        "name": "Serenade",
+        "aliases": ["pure-vocals"]
+      },
+      {
+        "id": 3,
+        "key": "bold",
+        "name": "Bold",
+        "aliases": ["bright-and-crisp"]
+      },
+      {
+        "id": 7,
+        "key": "hans-zimmer-soundscape-tuning",
+        "name": "Hans Zimmer Soundscape Tuning"
+      }
+    ]
+  }
+}

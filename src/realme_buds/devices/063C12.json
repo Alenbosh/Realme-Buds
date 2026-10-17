@@ -1,0 +1,63 @@
+{
+  "product_id": "063C12",
+  "name": "realme Buds T310",
+  "service_uuid": "0000079a-d102-11e1-9b23-00025b00a5a5",
+  "channel": 1,
+  "transport_type": "rfcomm",
+  "compatibility": "verified",
+  "capabilities": [
+    "battery",
+    "case_battery",
+    "firmware",
+    "anc",
+    "transparency",
+    "eq"
+  ],
+  "anc": {
+    "write_indices": {
+      "off": 0,
+      "transparency": 1,
+      "on": 2
+    },
+    "read_modes": {
+      "0": "off",
+      "1": "transparency",
+      "2": "on",
+      "3": "off"
+    },
+    "read_levels": {},
+    "sequences": {
+      "off": 64
+    }
+  },
+  "eq": {
+    "supports_custom": false,
+    "write_verified": true,
+    "custom_write_verified": false,
+    "presets": [
+      {
+        "id": 0,
+        "key": "balanced",
+        "name": "Balanced"
+      },
+      {
+        "id": 1,
+        "key": "bass",
+        "name": "Clear Bass",
+        "aliases": ["bass-boost", "deep-sea-bass"]
+      },
+      {
+        "id": 2,
+        "key": "vocals",
+        "name": "Clear Vocals",
+        "aliases": ["pure-vocals", "serenade"]
+      },
+      {
+        "id": 3,
+        "key": "bright",
+        "name": "Bright",
+        "aliases": ["bold", "bright-and-crisp"]
+      }
+    ]
+  }
+}

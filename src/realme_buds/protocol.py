@@ -16,9 +16,11 @@ QUERY_ANC = 0x010C
 QUERY_STATUS = 0x010D
 QUERY_EQ = 0x010F
 QUERY_EQ_ALL = 0x0122
+SET_FEATURE = 0x0403
 SET_ANC = 0x0404
 SET_EQ = 0x0406
 SET_EQ_DETAIL = 0x0418
+RESPONSE_SET_FEATURE = 0x8403
 RESPONSE_SET_ANC = 0x8404
 RESPONSE_SET_EQ = 0x8406
 RESPONSE_SET_EQ_DETAIL = 0x8418
@@ -34,13 +36,24 @@ NOTIFY_STATE = 0x0204
 NOTIFY_EQ = 0x0504
 RESPONSE_BROADCAST_CODES = 0x8200
 
+FEATURE_WEAR_DETECTION = 0x04
+FEATURE_LOW_LATENCY = 0x06
+FEATURE_HEARING_ENHANCEMENT = 0x0B
+FEATURE_MULTIPOINT = 0x11
+FEATURE_HIGH_QUALITY_AUDIO = 0x18
+FEATURE_GAME_MODE = 0x28
+
 FEATURE_SWITCH_NAMES = {
-    0x04: "wear_detection",
-    0x06: "low_latency",
-    0x0B: "hearing_enhancement",
-    0x11: "multipoint",
-    0x18: "high_quality_audio",
+    FEATURE_WEAR_DETECTION: "wear_detection",
+    FEATURE_LOW_LATENCY: "low_latency",
+    FEATURE_HEARING_ENHANCEMENT: "hearing_enhancement",
+    FEATURE_MULTIPOINT: "multipoint",
+    FEATURE_HIGH_QUALITY_AUDIO: "high_quality_audio",
+    FEATURE_GAME_MODE: "game_mode",
 }
+
+FEATURE_SWITCH_IDS = {name: fid for fid, name in FEATURE_SWITCH_NAMES.items()}
+
 
 # Authentication frames have a legacy envelope that is not representable by
 # encode_frame: HELLO carries a trailing 0x12 beyond its zero inner length.
@@ -279,6 +292,20 @@ def parse_set_anc_status(frame: Frame) -> int | None:
     if frame.command != RESPONSE_SET_ANC or not frame.payload:
         return None
     return frame.payload[0]
+
+
+def encode_set_feature_payload(feature_id: int, enabled: bool) -> bytes:
+    """Encode payload to set a boolean feature switch (e.g. game mode or wear detection)."""
+    if not 0 <= feature_id <= 0xFF:
+        raise ValueError("feature_id must fit in one byte")
+    return bytes((feature_id, 1 if enabled else 0))
+
+
+def parse_set_feature_status(frame: Frame) -> int | None:
+    if frame.command != RESPONSE_SET_FEATURE or not frame.payload:
+        return None
+    return frame.payload[0]
+
 
 
 def parse_eq_id(frame: Frame) -> int | None:

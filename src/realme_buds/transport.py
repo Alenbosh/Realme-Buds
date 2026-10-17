@@ -3,11 +3,61 @@ from __future__ import annotations
 import socket
 import time
 from collections.abc import Callable, Sequence
+from typing import Protocol, runtime_checkable
 
 from .lifecycle_trace import mark, span
 from .protocol import HELLO, Frame, FrameStream, encode_frame
 
 DEFAULT_CHANNELS = (15, 1, 6)
+
+
+@runtime_checkable
+class Transport(Protocol):
+    """Abstract interface for Bluetooth communication with OPO-compatible earbuds."""
+
+    address: str
+    channel: int
+
+    @property
+    def is_connected(self) -> bool:
+        ...
+
+    def __enter__(self) -> Transport:
+        ...
+
+    def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
+        ...
+
+    def send_query(self, command: int, payload: bytes = b"") -> int:
+        ...
+
+    def query(
+        self,
+        command: int,
+        payload: bytes = b"",
+        wait: float = 0.15,
+        sequence: int | None = None,
+    ) -> list[Frame]:
+        ...
+
+    def exchange_raw(self, packet: bytes, wait: float) -> list[Frame]:
+        ...
+
+    def request(
+        self,
+        command: int,
+        payload: bytes,
+        response_command: int,
+        *,
+        sequence: int | None = None,
+        on_sent: Callable[[], None] | None = None,
+        on_frames: Callable[[list[Frame]], None] | None = None,
+        timeout: float | None = None,
+    ) -> Frame:
+        ...
+
+    def receive(self, wait: float = 0.0) -> list[Frame]:
+        ...
 
 
 class RfcommTransport:
@@ -28,6 +78,10 @@ class RfcommTransport:
         self._socket: socket.socket | None = None
         self._sequence = 1
         self._stream = FrameStream()
+
+    @property
+    def is_connected(self) -> bool:
+        return self._socket is not None
 
     def __enter__(self) -> "RfcommTransport":
         for attempt in range(self.connect_attempts):
@@ -175,3 +229,24 @@ class RfcommTransport:
             frames.extend(self._stream.feed(chunk))
         self._socket.settimeout(self.timeout)
         return frames
+
+
+def create_transport(
+    address: str,
+    channel: int | Sequence[int] = DEFAULT_CHANNELS,
+    timeout: float = 3.0,
+    connect_attempts: int = 1,
+    retry_delay: float = 1.0,
+    transport_type: str = "rfcomm",
+) -> Transport:
+    """Factory creating the appropriate Transport instance for a device."""
+    if transport_type == "rfcomm":
+        return RfcommTransport(
+            address=address,
+            channel=channel,
+            timeout=timeout,
+            connect_attempts=connect_attempts,
+            retry_delay=retry_delay,
+        )
+    raise ValueError(f"unsupported transport type: {transport_type!r}")
+
